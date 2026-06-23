@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bergbad Retznei & s'Wirtshaus - Offizielle Webseite</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome für Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // Sicherheits-Absicherung gegen asynchrone Ladeverzögerungen des Tailwind-CDN
+        function configureTailwind() {
+            if (typeof tailwind !== 'undefined') {
+                tailwind.config = {
+                    theme: {
+                        extend: {
+                            colors: {
+                                steiermark: {
+                                    50: '#f4f8f4',  // Sanftes, helles Natur-Grün
+                                    100: '#e3efe2', // Zartes Lindgrün
+                                    200: '#c5dec3', // Mildes Moosgrün
+                                    500: '#2e6f40', // Das klassische steirische Grün (Grünes Herz)
+                                    800: '#1c452b', // Tiefes Waldgrün
+                                    900: '#0f2b1d', // Edles, dunkles Tannengrün
+                                },
+                                accent: {
+                                    gold: '#d4af37', // Warmes Weinstraßen-Gold für Spezialitäten
+                                    blue: '#3b82f6', // Kristallklares Poolblau für das Bad
+                                }
+                            }
+                        }
+                    }
+                };
+            } else {
+                // Erneut versuchen nach einer kurzen Verzögerung
+                setTimeout(configureTailwind, 50);
+            }
+        }
+        configureTailwind();
+    </script>
+    <style>
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f4f8f4;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #2e6f40;
+            border-radius: 3px;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-steiermark-50 text-steiermark-900 font-sans min-h-screen flex flex-col custom-scroll">
+
+    <!-- TOP BAR: Simulation Selector (Only visible for prototype evaluation) -->
+    <div class="bg-steiermark-900 text-white py-2 px-4 sticky top-0 z-50 shadow-md border-b border-steiermark-500/20 text-xs">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="font-semibold uppercase tracking-wider text-steiermark-200" data-de="Interaktiver Prototyp" data-sl="Interaktivni prototip">Interaktiver Prototyp</span>
+            </div>
+            
+            <div class="flex bg-steiermark-800 p-1 rounded border border-steiermark-500/30">
+                <button id="btn-user-view" onclick="setView('user')" class="px-2.5 py-1 rounded text-xs font-bold transition-all bg-steiermark-500 text-white flex items-center gap-1">
+                    <i class="fa-solid fa-eye"></i> <span data-de="Besucher-Ansicht" data-sl="Pogled obiskovalca">Besucher-Ansicht</span>
+                </button>
+                <button id="btn-admin-view" onclick="setView('admin')" class="px-2.5 py-1 rounded text-xs font-bold transition-all text-steiermark-300 hover:text-white flex items-center gap-1">
+                    <i class="fa-solid fa-sliders"></i> <span data-de="Pächter-Dashboard (Admin)" data-sl="Nadzorna plošča">Pächter-Dashboard (Admin)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN INTERACTIVE CONTAINER -->
+    <main class="flex-grow flex flex-col">
+        
+        <!-- ========================================== -->
+        <!-- VIEW A: PUBLIC VISITOR WEBSITE             -->
+        <!-- ========================================== -->
+        <div id="user-view-container" class="block flex-grow transition-opacity duration-300">
+            
+            <!-- STICKY HEADER - Visible on scroll, containing only official Bergbad Retznei wave logo -->
+            <header class="bg-white/95 backdrop-blur-md border-b border-steiermark-200 py-3 px-6 sticky top-[37px] sm:top-[37px] z-40 shadow-sm">
+                <div class="max-w-7xl mx-auto flex justify-between items-center">
+                    
+                    <!-- Fixed Bad Logo (logo.png) - Web-safe Name -->
+                    <a href="#" class="flex items-center gap-4">
+                        <img src="logo.png" 
+                             alt="Bergbad Retznei Logo" 
+                             class="h-16 sm:h-20 w-auto object-contain"
+                             onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/droplets.svg';" />
+                        <div class="hidden sm:block">
+                            <span class="text-xs uppercase tracking-widest font-black text-steiermark-500 block" data-de="Öffentliches Gemeindebad" data-sl="Javno občinsko kopališče">Öffentliches Gemeindebad</span>
+                            <span class="text-[10px] text-steiermark-400 font-semibold" data-de="Ehrenhausen an der Weinstraße" data-sl="Ehrenhausen ob vinski cesti">Ehrenhausen an der Weinstraße</span>
+                        </div>
+                    </a>
+
+                    <!-- Anchor Navigation Menu -->
+                    <nav class="hidden md:flex items-center gap-6 text-sm font-extrabold text-steiermark-800">
+                        <a href="#angebot" class="hover:text-steiermark-500 transition-colors" data-de="Angebot" data-sl="Ponudba">Angebot</a>
+                        <a href="#restauration" class="hover:text-steiermark-500 transition-colors" data-de="Restauration" data-sl="Gostinstvo">Restauration</a>
+                        <a href="#veranstaltungen" class="hover:text-steiermark-500 transition-colors" data-de="Veranstaltungen" data-sl="Dogodki">Veranstaltungen</a>
+                        <a href="#impressum" class="hover:text-steiermark-500 transition-colors" data-de="Impressum" data-sl="Impressum">Impressum</a>
+                    </nav>
+
+                    <!-- Language and Reservation -->
+                    <div class="flex items-center gap-3">
+                        <!-- Lang Toggle -->
+                        <div class="flex bg-steiermark-100 p-0.5 rounded border border-steiermark-200 text-xs font-bold">
+                            <button onclick="setLanguage('de')" id="lang-de" class="px-2 py-1 rounded bg-white text-steiermark-900 shadow-sm transition-all">DE</button>
+                            <button onclick="setLanguage('sl')" id="lang-sl" class="px-2 py-1 rounded text-steiermark-500 hover:text-steiermark-900 transition-all">SL</button>
+                        </div>
+
+                        <!-- Quick Call Table Reservation -->
+                        <a href="tel:+436645808000" class="bg-accent-gold hover:bg-amber-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-full transition-all flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-phone"></i>
+                            <span class="hidden sm:inline" data-de="Wirtshaus anrufen" data-sl="Pokliči Gostilno">Wirtshaus anrufen</span>
+                        </a>
+
+                        <!-- Mobile Hamburger Button -->
+                        <button onclick="toggleMobileMenu()" class="md:hidden text-steiermark-800 focus:outline-none p-2 rounded-lg hover:bg-steiermark-100">
+                            <i class="fa-solid fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Tray -->
+                <div id="mobile-menu" class="hidden md:hidden mt-3 pt-3 border-t border-steiermark-100 flex flex-col gap-2 text-sm font-bold text-steiermark-800">
+                    <a href="#angebot" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Angebot" data-sl="Ponudba">Angebot</a>
+                    <a href="#restauration" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Restauration" data-sl="Gostinstvo">Restauration</a>
+                    <a href="#veranstaltungen" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Veranstaltungen" data-sl="Dogodki">Veranstaltungen</a>
+                    <a href="#impressum" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Impressum" data-sl="Impressum">Impressum</a>
+                </div>
+            </header>
+
+            <!-- Live Status Banner -->
+            <div class="bg-steiermark-500 text-white py-1.5 px-6">
+                <div class="max-w-7xl mx-auto flex justify-between items-center text-xs font-bold">
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-cloud-sun text-accent-gold"></i>
+                        <span data-de="Freibad geöffnet: Täglich 09:00 - 20:00 Uhr" data-sl="Kopališče odprto: Vsak dan 09:00 - 20:00">Freibad geöffnet: Täglich 09:00 - 20:00 Uhr</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span data-de="Wirtshaus Küche: 09:00 - 23:00 Uhr" data-sl="Kuhinja gostilne: 09:00 - 23:00">Wirtshaus Küche: 09:00 - 23:00 Uhr</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HERO SECTOR - RADIKALE BEREINIGUNG (Slogan top-right, background right-focused on mobile, bg-white ensures no dark colors blend) -->
+            <section class="relative bg-white text-white overflow-hidden py-16 sm:py-24" style="isolation: isolate;">
+                <!-- Original Clean Background Image (bergbad_retznei.png) - object-right on mobile ensures pool lady is seen -->
+                <img id="hero-bg-img" 
+                     src="bergbad_retznei.png" 
+                     alt="Bergbad Retznei Panorama" 
+                     class="absolute inset-0 w-full h-full object-cover object-right sm:object-center"
+                     style="z-index: -2;"
+                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1600&q=80';" />
+                
+                <!-- Kein verdunkelnder/grüner Overlay mehr. Nur nacktes, helles Bild für maximale Farbbrillanz -->
+                
+                <!-- Layout-Adjustment: Container with alignment structure -->
+                <div class="relative max-w-7xl mx-auto px-8 z-10 flex flex-col justify-center min-h-[350px] sm:min-h-[450px]">
+                    
+                    <!-- Grid System to place the Logo Right-of-center -->
+                    <div class="w-full grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                        <div class="hidden md:block md:col-span-5"></div>
+                        
+                        <!-- Slogan Logo (slogan.png): rechts von der Mitte (col-span-7), kleiner & transparent (PNG Transparenz dank automatischem JS-Hintergrundentferner) -->
+                        <div class="col-span-12 md:col-span-7 flex justify-center md:justify-end">
+                            <img id="slogan-img"
+                                 src="slogan.png" 
+                                 alt="Freizeit über den Dächern der Südsteiermark" 
+                                 class="w-full max-w-[280px] sm:max-w-xs md:max-w-sm h-auto object-contain drop-shadow-xl mix-blend-multiply bg-transparent"
+                                 onload="removeWhiteBackground(this)"
+                                 onerror="this.onerror=null; this.src='slogan.jpg'; this.onload=function(){ removeWhiteBackground(this); }; this.onerror=function(){ this.style.display='none'; document.getElementById('fallback-slogan-text').classList.remove('hidden'); };" />
+                            
+                            <!-- Robuster Text-Fallback falls beide Bilder nicht gefunden werden -->
+                            <div id="fallback-slogan-text" class="hidden text-center md:text-right py-4">
+                                <h2 class="text-3xl sm:text-4xl font-black italic text-white drop-shadow-lg" data-de="Freizeit über den Dächern der Südsteiermark" data-sl="Prosti čas nad strehami Južne Štajerske">Freizeit über den Dächern der Südsteiermark</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Call-to-actions mittig (center) angeordnet -->
+                    <div class="w-full flex flex-wrap justify-center gap-4 pt-10">
+                        <a href="#angebot" class="bg-white/95 text-steiermark-900 font-extrabold text-xs px-6 py-3.5 rounded-lg hover:bg-white transition-all shadow-lg flex items-center gap-2">
+                            <i class="fa-solid fa-umbrella-beach text-accent-blue"></i>
+                            <span data-de="Zum Badetarife & Angebot" data-sl="Ponudba in cenik">Zum Badetarife & Angebot</span>
+                        </a>
+                        <a href="#restauration" class="bg-steiermark-500 text-white font-extrabold text-xs px-6 py-3.5 rounded-lg hover:bg-steiermark-600 transition-all shadow-lg flex items-center gap-2 border border-emerald-500/30">
+                            <i class="fa-solid fa-utensils"></i>
+                            <span data-de="s'Wirtshaus Speisekarte" data-sl="Ponudba gostilne">s'Wirtshaus Speisekarte</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- SECTION 1: ANGEBOT                         -->
+            <!-- ========================================== -->
+            <section id="angebot" class="py-20 bg-white border-b border-steiermark-200">
+                <div class="max-w-6xl mx-auto px-6">
+                    <div class="text-center space-y-2 mb-12">
+                        <span class="text-xs font-bold text-steiermark-500 uppercase tracking-widest" data-de="Alles auf einem Blick" data-sl="Vse na enem mestu">Alles auf einem Blick</span>
+                        <h2 class="text-3xl sm:text-4xl font-black text-steiermark-900" data-de="Unser Angebot im Bergbad" data-sl="Naša ponudba v kopališču">Unser Angebot im Bergbad</h2>
+                        <div class="h-1 w-16 bg-accent-gold mx-auto rounded-full"></div>
+                    </div>
+
+                    <!-- Angebot Cards: Eintrittspreise (Links), Gäste und Freizeitinfrastruktur (Mitte), Schwimmkurse für Kinder und Erwachsene (Rechts) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        
+                        <!-- Linkes Element: Eintrittspreise -->
+                        <div class="border border-steiermark-200 rounded-2xl p-6 bg-steiermark-50 flex flex-col justify-between space-y-6">
+                            <div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="bg-accent-blue/15 text-accent-blue text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" data-de="TARIFE" data-sl="CENIK">TARIFE</span>
+                                    <span class="text-xs font-bold text-steiermark-500" id="user-eintrittspreise-filename">tarife.pdf</span>
+                                </div>
+                                <h3 class="text-lg font-black text-steiermark-900" data-de="Eintrittspreise" data-sl="Vstopnice & Cene">Eintrittspreise</h3>
+                                <p class="text-xs text-steiermark-600 mt-2" data-de="Eintrittskarten sind für Retznei & Ehrenhausen gültig:" data-sl="Vstopnice veljajo za kopališču v Retzneju in Ehrenhausnu:">
+                                    Eintrittskarten sind für Retznei & Ehrenhausen gültig:
+                                </p>
+                                
+                                <div class="text-xs space-y-2 mt-4 font-semibold text-steiermark-700">
+                                    <div class="flex justify-between border-b border-steiermark-200 pb-1.5">
+                                        <span data-de="Tageskarte Erwachsene" data-sl="Odrasli - dnevna vstopnica">Tageskarte Erwachsene</span>
+                                        <span class="font-extrabold">€ 5,00</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-steiermark-200 pb-1.5 text-steiermark-500">
+                                        <span data-de="Erwachsene ab 16:00 Uhr" data-sl="Odrasli po 16. uri">Erwachsene ab 16:00 Uhr</span>
+                                        <span>€ 4,00</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-steiermark-200 pb-1.5">
+                                        <span data-de="Kinder (6 - 15 Jahre)" data-sl="Otroci (6 - 15 let)">Kinder (6 - 15 Jahre)</span>
+                                        <span class="font-extrabold">€ 3,00</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span data-de="Saisonkarte Erwachsene" data-sl="Sezonska vstopnica">Saisonkarte Erwachsene</span>
+                                        <span class="font-extrabold">€ 80,00</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Einheitlicher grüner Button -->
+                            <button onclick="simulatePdfDownload('Eintrittspreise')" class="w-full bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span data-de="Tarifliste öffnen (PDF)" data-sl="Odpri cenik (PDF)">Tarifliste öffnen (PDF)</span>
+                            </button>
+                        </div>
+
+                        <!-- Mittleres Element: Gäste und Freizeitinfrastruktur -->
+                        <div class="border border-steiermark-200 rounded-2xl p-6 bg-steiermark-50 flex flex-col justify-between space-y-6">
+                            <div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="bg-steiermark-200 text-steiermark-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" data-de="Sport & Erholung" data-sl="Šport in sprostitev">Sport & Erholung</span>
+                                    <span class="text-xs font-bold text-steiermark-500" id="user-angebote-filename">sport_und_erholung.pdf</span>
+                                </div>
+                                <h3 class="text-lg font-black text-steiermark-900" data-de="Gäste und Freizeitinfrastruktur" data-sl="Zabava & Rekreacija">Gäste und Freizeitinfrastruktur</h3>
+                                <p class="text-xs text-steiermark-600 mt-2" data-de="Unser kleines, gemütliches Familienbad überzeugt durch Vielfalt am Rosenberg:" data-sl="Naše prijetno družinsko kopališče ponuja številne športne aktivnosti:">
+                                    Unser kleines, gemütliches Familienbad überzeugt durch Vielfalt am Rosenberg:
+                                </p>
+                                
+                                <ul class="text-xs text-steiermark-700 mt-4 space-y-2.5 font-semibold">
+                                    <li class="flex items-center gap-2"><i class="fa-solid fa-water text-accent-blue"></i> <span data-de="Großes Sportbecken (33,3m x 16m)" data-sl="Velik športni bazen (33,3m x 16m)">Großes Sportbecken (33,3m x 16m)</span></li>
+                                    <li class="flex items-center gap-2"><i class="fa-solid fa-child-reaching text-accent-blue"></i> <span data-de="Kinderbecken mit Kleinkinderrutsche" data-sl="Otroški bazen z malim toboganom">Kinderbecken mit Kleinkinderrutsche</span></li>
+                                    <li class="flex items-center gap-2"><i class="fa-solid fa-sun text-accent-gold"></i> <span data-de="Großzügige, ruhige Hang-Liegewiesen" data-sl="Veliki mirni travniki za sončenje">Großzügige, ruhige Hang-Liegewiesen</span></li>
+                                </ul>
+
+                                <!-- Hidden Details / Beachvolleyball Accordion -->
+                                <div class="mt-4 pt-3 border-t border-steiermark-200">
+                                    <details class="group text-xs text-steiermark-600 cursor-pointer">
+                                        <summary class="font-bold flex items-center justify-between text-steiermark-800">
+                                            <span data-de="Beachvolleyball & Verleih-Details" data-sl="Podrobnosti o igrišču in opremi">Beachvolleyball & Verleih-Details</span>
+                                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform"></i>
+                                        </summary>
+                                        <div class="mt-2 space-y-1.5 pl-2 leading-relaxed">
+                                            <p data-de="• Perfekt gepflegter Beachvolleyballplatz direkt am Areal." data-sl="• Odlično vzdrževano igrišče za odbojko na mivki.">• Perfekt gepflegter Beachvolleyballplatz direkt am Areal.</p>
+                                            <p data-de="• Bequemer Liegen- & Sonnenschirmverleih vor Ort." data-sl="• Najem ležalnikov in senčnikov neposredno ob bazenu.">• Bequemer Liegen- & Sonnenschirmverleih vor Ort.</p>
+                                        </div>
+                                    </details>
+                                </div>
+                            </div>
+                            <!-- Einheitlicher grüner Button -->
+                            <button onclick="simulatePdfDownload('Bad-Infos')" class="w-full bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span data-de="Bad-Infoflyer öffnen (PDF)" data-sl="Odpri letak kopališča (PDF)">Bad-Infoflyer öffnen (PDF)</span>
+                            </button>
+                        </div>
+
+                        <!-- Rechte Position: Schwimmkurse für Kinder und Erwachsene -->
+                        <div class="border border-steiermark-200 rounded-2xl p-6 bg-steiermark-50 flex flex-col justify-between space-y-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="bg-accent-blue/15 text-accent-blue text-[10px] font-black px-2.5 py-1 rounded-full uppercase" data-de="Kursangebot" data-sl="Plavalni tečaji">Kursangebot</span>
+                                    <span class="text-xs font-bold text-steiermark-500" id="user-kursangebote-filename">kursangebote.pdf</span>
+                                </div>
+                                <h3 class="text-lg font-black text-steiermark-900" data-de="Schwimmkurse für Kinder und Erwachsene" data-sl="Tečaji plavanja - SWIM CLINIC">Schwimmkurse für Kinder und Erwachsene</h3>
+                                <p class="text-xs text-steiermark-600 leading-relaxed"
+                                   data-de="Das erfahener Team der SWIM CLINIC bietet regelmäßig strukturierte Kurse in den Sommermonaten im Bergbad Retznei an. Geeignet für Anfänger und Fortgeschrittene."
+                                   data-sl="Ekipa SWIM CLINIC pripravlja poletne tečaje plavanja za otroke in odrasle v gorskem kopališču Retznei. Primerno za začetnike in nadaljevalce.">
+                                    Das erfahrene Team der SWIM CLINIC bietet regelmäßig strukturierte Kurse in den Sommermonaten im Bergbad Retznei an. Geeignet für Anfänger und Fortgeschrittene.
+                                </p>
+                            </div>
+                            <!-- Einheitlicher grüner Button -->
+                            <button onclick="simulatePdfDownload('Kursangebot-PDF')" class="w-full bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span data-de="Kursangebot ansehen (PDF)" data-sl="Odpri info letak (PDF)">Kursangebot ansehen (PDF)</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- SECTION 2: RESTAURATION (s'Wirtshaus)     -->
+            <!-- ========================================== -->
+            <section id="restauration" class="py-20 bg-steiermark-50 border-b border-steiermark-200">
+                <div class="max-w-4xl mx-auto px-6">
+                    
+                    <!-- "s´Wirtshaus" direkt über dem Bereich für die Speisekarte -->
+                    <div class="text-center space-y-2 mb-12">
+                        <span class="text-xs font-bold text-accent-gold uppercase tracking-widest" data-de="s´Wirtshaus" data-sl="s´Wirtshaus">s´Wirtshaus</span>
+                        <h2 class="text-3xl sm:text-4xl font-black text-steiermark-900" data-de="Unsere Speisekarte" data-sl="Naša ponudba">Unsere Speisekarte</h2>
+                        <div class="h-1 w-16 bg-accent-gold mx-auto rounded-full"></div>
+                    </div>
+
+                    <!-- Only one single box remains: Speisekarte -->
+                    <div class="bg-white p-8 rounded-2xl border border-steiermark-200 shadow-lg text-center space-y-6">
+                        <div class="text-steiermark-50 text-5xl">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+                        <p class="text-sm text-steiermark-600 max-w-md mx-auto" data-de="Genießen Sie unsere regionalen Köstlichkeiten, frisch belegte Pizza, saftige Burger sowie kühle Getränke direkt am Pool." data-sl="Uživajte v naših domačih dobrotah, picah, sočnih burgerjih ter osvežilnih pijačah neposredno ob bazenu.">
+                            Genießen Sie unsere regionalen Köstlichkeiten, frisch belegte Pizza, saftige Burger sowie kühle Getränke direkt am Pool.
+                        </p>
+
+                        <!-- Speisekarte Button -->
+                        <div class="flex justify-center">
+                            <button onclick="simulatePdfDownload('Speisenkarte')" class="bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-sm px-8 py-3 rounded-lg transition-all flex items-center gap-2 shadow-md">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span data-de="Speisekarte öffnen (PDF)" data-sl="Odpri cenik (PDF)">Speisekarte öffnen (PDF)</span>
+                            </button>
+                        </div>
+
+                        <!-- Live User Upload Container for Speisekarte (Shows PDF or Image) -->
+                        <div id="speisekarte-image-preview-container" class="hidden border border-steiermark-200 rounded-xl overflow-hidden bg-steiermark-50 p-4 mt-6">
+                            <div id="speisekarte-media-preview" class="w-full h-auto"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- SECTION 3: VERANSTALTUNGEN                 -->
+            <!-- ========================================== -->
+            <section id="veranstaltungen" class="py-20 bg-white border-b border-steiermark-200">
+                <div class="max-w-6xl mx-auto px-6">
+                    <div class="text-center space-y-2 mb-12">
+                        <span class="text-xs font-bold text-accent-blue uppercase tracking-widest" data-de="Unterhaltung am Rosenberg" data-sl="Dogodki ob bazenu">Unterhaltung am Rosenberg</span>
+                        <h2 class="text-3xl sm:text-4xl font-black text-steiermark-900" data-de="Veranstaltungen & Aktivitäten" data-sl="Koledar dogodkov">Veranstaltungen & Aktivitäten</h2>
+                        <div class="h-1 w-16 bg-accent-blue mx-auto rounded-full"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        
+                        <!-- Left Column: Poolpartys -->
+                        <div class="border border-steiermark-200 rounded-2xl p-6 bg-steiermark-50 flex flex-col justify-between space-y-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="bg-red-100 text-red-700 text-[10px] font-black px-2.5 py-1 rounded-full uppercase" data-de="POOLPARTY" data-sl="POOLPARTY">POOLPARTY</span>
+                                    <span class="text-xs font-bold text-steiermark-500" id="user-poolparty-filename">poolparty.png</span>
+                                </div>
+                                <h3 class="text-xl font-black text-steiermark-900" data-de="Poolpartys" data-sl="Zabave ob bazenu">Poolpartys</h3>
+                                <p class="text-xs text-steiermark-600 leading-relaxed"
+                                   data-de="Genieße romantisches Nachtbaden bis 22 Uhr bei Kerzenschein und stimmungsvoller Musik unterm Sternenhimmel."
+                                   data-sl="Uživajte v romantičnem nočnem kopanju do 22. ure ob soju sveč in prijetni glasbi pod zvezdnatim nebom.">
+                                    Genieße romantisches Nachtbaden bis 22 Uhr bei Kerzenschein und stimmungsvoller Musik unterm Sternenhimmel.
+                                </p>
+                                
+                                <!-- Poolparty-Bild Container - Höhe auf h-48 verdoppelt (doppelt so hoch wie h-24) -->
+                                <div id="poolparty-preview-target" class="rounded-lg overflow-hidden border border-steiermark-200 shadow-sm relative group">
+                                    <img id="poolparty-img" 
+                                         src="poolparty.png" 
+                                         alt="Poolparty Bergbad Retznei" 
+                                         class="w-full h-48 object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80';" />
+                                </div>
+                            </div>
+                            <button onclick="simulatePdfDownload('Poolparty-Flyer')" class="w-full bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-image"></i>
+                                <span data-de="Poolparty Flyer öffnen" data-sl="Odpri letak zabave">Poolparty Flyer öffnen</span>
+                            </button>
+                        </div>
+
+                        <!-- Right Column: Events (Musik & Tanz als Events) -->
+                        <div class="border border-steiermark-200 rounded-2xl p-6 bg-steiermark-50 flex flex-col justify-between space-y-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="bg-accent-gold/15 text-accent-gold text-[10px] font-black px-2.5 py-1 rounded-full uppercase" data-de="Events" data-sl="Events">Events</span>
+                                    <span class="text-xs font-bold text-steiermark-500" id="user-events-filename">events.pdf</span>
+                                </div>
+                                <h3 class="text-xl font-black text-steiermark-900" data-de="Events" data-sl="Dogodki & Druženje">Events</h3>
+                                <p class="text-xs text-steiermark-600 leading-relaxed"
+                                   data-de="Das ganze Jahr über veranstalten wir gesellige Nachmittage und Abende für Jung und Alt. Mit stimmungsvoller Musik, Auftritten regionaler Künstler und bester Laune."
+                                   data-sl="Skozi celo leto prirejamo družabna srečanja z živo glasbo, nastopi lokalnih umetnikov ter odlično gostinsko ponudbo.">
+                                    Das ganze Jahr über veranstalten wir gesellige Nachmittage und Abende für Jung und Alt. Mit stimmungsvoller Musik, Auftritten regionaler Künstler und bester Laune.
+                                </p>
+                                
+                                <!-- Display Area for Events PDF / Image -->
+                                <div id="events-preview-target" class="hidden border border-steiermark-200 rounded-xl bg-white p-4 text-center space-y-3">
+                                    <div class="text-steiermark-500 text-3xl"><i class="fa-solid fa-file-pdf"></i></div>
+                                    <iframe id="events-pdf-iframe" src="" class="w-full h-[150px] border border-steiermark-100 rounded-lg"></iframe>
+                                </div>
+                            </div>
+                            <!-- Button for Events "Termine laut Aushang & Facebook" linking to events.pdf -->
+                            <button onclick="simulatePdfDownload('Events-PDF')" class="w-full bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span data-de="Termine laut Aushang & Facebook (PDF)" data-sl="Urnik dogodkov (PDF)">Termine laut Aushang & Facebook</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- SECTION 4: IMPRESSUM & FOOTER              -->
+            <!-- ========================================== -->
+            <footer id="impressum" class="bg-steiermark-900 text-steiermark-100 py-16 px-6 border-t border-steiermark-500/20">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-sm">
+                    
+                    <!-- Contact / Legal -->
+                    <div class="space-y-4">
+                        <h4 class="font-black text-white text-lg" data-de="Impressum & Kontakt" data-sl="Kontakti & Podatki">Impressum & Kontakt</h4>
+                        <div class="space-y-2 text-xs font-semibold text-steiermark-300 leading-relaxed">
+                            <p class="font-extrabold text-white" data-de="Wirtshaus-Pächterin:" data-sl="Najemnica gostilne:">Wirtshaus-Pächterin:</p>
+                            <p>Doroteja Korošec</p>
+                            <p>Retznei 66, 8461 Ehrenhausen an der Weinstraße</p>
+                            <p class="pt-2"><i class="fa-solid fa-phone text-accent-gold mr-1.5"></i> <a href="tel:+43345373973" class="hover:underline">+43 3453 73973</a></p>
+                            <p><i class="fa-solid fa-phone text-accent-gold mr-1.5"></i> <a href="tel:+436645808000" class="hover:underline">+43 664 580 8000</a></p>
+                        </div>
+                    </div>
+
+                    <!-- Ownership Note -->
+                    <div class="space-y-4">
+                        <h4 class="font-black text-white text-lg" data-de="Gemeinde Ehrenhausen" data-sl="Občina Ehrenhausen">Gemeinde Ehrenhausen</h4>
+                        <p class="text-xs text-steiermark-300 leading-relaxed font-medium"
+                           data-de="Das Bergbad Retznei selbst gehört der Marktgemeinde Ehrenhausen an der Weinstraße. Der Wirtshausbetrieb 's´Wirtshaus im Bergbad' wird von einer selbstständigen Pächterin geführt."
+                           data-sl="Gorsko kopališču Retznei je v lasti občine Ehrenhausen na vinski cesti. Gostilno 's´Wirtshaus' samostojno upravlja najemnica Doroteja Korošec.">
+                            Das Bergbad Retznei selbst gehört der Marktgemeinde Ehrenhausen an der Weinstraße. Der Wirtshausbetrieb 's´Wirtshaus im Bergbad' wird von einer selbstständigen Pächterin geführt.
+                        </p>
+                    </div>
+
+                    <!-- Open Hours -->
+                    <div class="space-y-4">
+                        <h4 class="font-black text-white text-lg" data-de="Saisonale Betriebszeiten" data-sl="Delovni chal">Saisonale Betriebszeiten</h4>
+                        <div class="space-y-2 text-xs font-semibold text-steiermark-300">
+                            <p class="font-extrabold text-white" data-de="Badesaison (Juni - September):" data-sl="Kopališka sezona (Junij - September):">Badesaison (Juni - September):</p>
+                            <p data-de="Montag - Sonntag: 09:00 - 20:00 Uhr" data-sl="Ponedeljek - Nedelja: 09:00 - 20:00">Montag - Sonntag: 09:00 - 20:00 Uhr</p>
+                            <p class="font-extrabold text-white pt-2" data-de="Wirtshausbetrieb (April - Oktober):" data-sl="Sezona gostilne (April - Oktober):">Wirtshausbetrieb (April - Oktober):</p>
+                            <p data-de="Montag - Sonntag: 09:00 - 23:00 Uhr" data-sl="Ponedeljek - Nedelja: 09:00 - 23:00">Montag - Sonntag: 09:00 - 23:00 Uhr</p>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div class="max-w-6xl mx-auto border-t border-steiermark-500/10 mt-12 pt-6 text-center text-[10px] text-steiermark-400 font-semibold">
+                    <p>© 2026 Marktgemeinde Ehrenhausen & s'Wirtshaus im Bergbad Retznei. Alle Rechte vorbehalten. Konzipiert für Doroteja Korošec.</p>
+                </div>
+            </footer>
+
+        </div>
+
+
+        <!-- ========================================== -->
+        <!-- VIEW B: PÄCHTER-DASHBOARD (ADMIN PANEL)    -->
+        <!-- ========================================== -->
+        <div id="admin-view-container" class="hidden flex-grow bg-steiermark-100 py-12 px-6">
+            <div class="max-w-4xl mx-auto space-y-8">
+                
+                <!-- Admin Header -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-steiermark-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-steiermark-500 text-white p-3 rounded-xl">
+                            <i class="fa-solid fa-sliders text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-black text-steiermark-900" data-de="Pächter-Wartungsbereich (Grünes Herz)" data-sl="Nadzorna plošča">Pächter-Wartungsbereich (Grünes Herz)</h2>
+                            <p class="text-xs text-steiermark-500 font-semibold" data-de="Absolute Synchronisierung aller Dokumente und Bezeichnungen" data-sl="Sinhronizacija dokumentov">Absolute Synchronisierung aller Dokumente und Bezeichnungen</p>
+                        </div>
+                    </div>
+                    <div class="bg-steiermark-100 border border-steiermark-200 rounded-lg px-4 py-2 text-xs font-bold text-steiermark-800">
+                        <i class="fa-solid fa-user-gear mr-1 text-steiermark-500"></i> Hallo, Doroteja Korošec!
+                    </div>
+                </div>
+
+                <!-- Strategic Explanation Alert -->
+                <div class="bg-emerald-50 border-l-4 border-steiermark-500 p-5 rounded-r-xl space-y-2">
+                    <h4 class="font-extrabold text-sm text-steiermark-800"><i class="fa-solid fa-circle-info"></i> Synchronisierte Datei-Wartung:</h4>
+                    <p class="text-xs text-steiermark-900 leading-relaxed font-medium">
+                        Laden Sie einfach Ihre fertigen PDFs oder Bilder hoch. Das System benennt die hochgeladenen Dateien automatisch web-sicher um und aktualisiert sofort die Besucher-Ansicht!
+                    </p>
+                </div>
+
+                <!-- HERO BACKGROUND UPLOADER CARD -->
+                <div class="bg-white rounded-2xl border-2 border-accent-gold p-6 space-y-4 shadow-md">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-accent-gold/10 text-accent-gold p-2 rounded-lg text-sm"><i class="fa-solid fa-image"></i></span>
+                            <h4 class="font-black text-base text-steiermark-900">Hero-Hintergrundbild des Schwimmbads</h4>
+                        </div>
+                        <span class="text-[10px] bg-accent-gold/25 text-amber-800 px-2.5 py-1 rounded-full font-black uppercase">Dateiname: bergbad_retznei.png</span>
+                    </div>
+                    <p class="text-xs text-steiermark-600 font-medium">
+                        Lade hier das generierte Hauptbild deines Schwimmbads hoch, damit es großflächig hinter der Überschrift der Startseite angezeigt wird.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 items-center bg-steiermark-50 p-4 rounded-xl border border-steiermark-200">
+                        <!-- Custom File Input styled as Premium Button -->
+                        <label class="w-full sm:w-auto bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-5 py-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer shrink-0">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Bild auswählen &amp; hochladen</span>
+                            <input type="file" class="hidden" accept="image/*" onchange="handleLocalImageUpload(event, 'hero')">
+                        </label>
+                        <div class="text-[11px] text-steiermark-600 font-semibold" id="hero-upload-filename-status">
+                            bergbad_retznei.png (Standard verwendet)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FILE SIMULATOR GRID (Strictly aligned to Frontend nomenclature) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- UPLOAD MODULE 1: SPEISEKARTE (Only Speisekarte remains, no tagesmenü / specials) -->
+                    <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-utensils"></i></span>
+                                <h4 class="font-extrabold text-sm text-steiermark-900">Speisekarte</h4>
+                            </div>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">speisekarte.pdf</span>
+                        </div>
+                        
+                        <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-speisekarte-filename" class="font-bold text-steiermark-800">speisekarte.pdf</span></div>
+                            
+                            <!-- Premium Uploader -->
+                            <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                                <i class="fa-solid fa-folder-open text-steiermark-500"></i>
+                                <span>Datei auswählen</span>
+                                <input type="file" class="hidden" accept="image/*,application/pdf" onchange="handleLocalImageUpload(event, 'speisekarte')">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- UPLOAD MODULE 2: EINTRITTSPREISE -->
+                    <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-file-pdf"></i></span>
+                                <h4 class="font-extrabold text-sm text-steiermark-900">Eintrittspreise</h4>
+                            </div>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">tarife.pdf</span>
+                        </div>
+                        
+                        <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-eintrittspreise-filename" class="font-bold text-steiermark-800">tarife.pdf</span></div>
+                            
+                            <!-- Premium Uploader -->
+                            <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                                <i class="fa-solid fa-folder-open text-steiermark-500"></i>
+                                <span>Datei auswählen</span>
+                                <input type="file" class="hidden" accept="image/*,application/pdf" onchange="handleLocalImageUpload(event, 'tarife')">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- UPLOAD MODULE 3: GÄSTE UND FREIZEITINFRASTRUKTUR -->
+                    <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-circle-info"></i></span>
+                                <h4 class="font-extrabold text-sm text-steiermark-900">Gäste und Freizeitinfrastruktur</h4>
+                            </div>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">sport_und_erholung.pdf</span>
+                        </div>
+                        
+                        <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-angebote-filename" class="font-bold text-steiermark-800">sport_und_erholung.pdf</span></div>
+                            
+                            <!-- Premium Uploader -->
+                            <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                                <i class="fa-solid fa-folder-open text-steiermark-500"></i>
+                                <span>Datei auswählen</span>
+                                <input type="file" class="hidden" accept="image/*,application/pdf" onchange="handleLocalImageUpload(event, 'sport_und_erholung')">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- UPLOAD MODULE 4: SCHWIMMKURSE FÜR KINDER UND ERWACHSENE -->
+                    <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-person-swimming"></i></span>
+                                <h4 class="font-extrabold text-sm text-steiermark-900">Schwimmkurse für Kinder und Erwachsene</h4>
+                            </div>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">kursangebote.pdf</span>
+                        </div>
+                        
+                        <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-kursangebote-filename" class="font-bold text-steiermark-800">kursangebote.pdf</span></div>
+                            
+                            <!-- Premium Uploader -->
+                            <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                                <i class="fa-solid fa-folder-open text-steiermark-500"></i>
+                                <span>Datei auswählen</span>
+                                <input type="file" class="hidden" accept="image/*,application/pdf" onchange="handleLocalImageUpload(event, 'kursangebote')">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- UPLOAD MODULE 5: POOLPARTYS -->
+                    <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-music"></i></span>
+                                <h4 class="font-extrabold text-sm text-steiermark-900">Poolpartys</h4>
+                            </div>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">poolparty.png</span>
+                        </div>
+                        
+                        <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-poolparty-filename" class="font-bold text-steiermark-800">poolparty.png</span></div>
+                            
+                            <!-- Premium Uploader -->
+                            <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                                <i class="fa-solid fa-folder-open text-steiermark-500"></i>
+                                <span>Datei auswählen</span>
+                                <input type="file" class="hidden" accept="image/*" onchange="handleLocalImageUpload(event, 'poolparty')">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- UPLOAD MODULE 6: EVENTS -->
+                    <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-calendar-days"></i></span>
+                                <h4 class="font-extrabold text-sm text-steiermark-900">Events</h4>
+                            </div>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">events.pdf</span>
+                        </div>
+                        
+                        <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-events-filename" class="font-bold text-steiermark-800">events.pdf</span></div>
+                            
+                            <!-- Premium Uploader -->
+                            <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                                <i class="fa-solid fa-folder-open text-steiermark-500"></i>
+                                <span>Datei auswählen</span>
+                                <input type="file" class="hidden" accept="application/pdf" onchange="handleLocalImageUpload(event, 'events')">
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Simulation Info Toast -->
+                <div id="sim-toast" class="hidden mt-6 bg-emerald-600 text-white font-bold p-4 rounded-xl shadow-lg flex items-center justify-between transition-all">
+                    <span id="sim-toast-message">Datei erfolgreich hochgeladen und verarbeitet!</span>
+                    <button onclick="hideToast()" class="text-white hover:text-emerald-200"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- INTERACTIVE APP SCRIPT -->
+    <script>
+        // State variables
+        let currentView = 'user';
+        let currentLanguage = 'de';
+        
+        // Simulative Database of Files - Completely Synchronized
+        const database = {
+            hero: {
+                filename: 'bergbad_retznei.png',
+                dataUrl: null
+            },
+            speisekarte: {
+                filename: 'speisekarte.pdf',
+                isImage: false,
+                dataUrl: null
+            },
+            tarife: {
+                filename: 'tarife.pdf',
+                isImage: false,
+                dataUrl: null
+            },
+            sport_und_erholung: {
+                filename: 'sport_und_erholung.pdf',
+                isImage: false,
+                dataUrl: null
+            },
+            kursangebote: {
+                filename: 'kursangebote.pdf',
+                isImage: false,
+                dataUrl: null
+            },
+            poolparty: {
+                filename: 'poolparty.png',
+                isImage: true,
+                dataUrl: null
+            },
+            events: {
+                filename: 'events.pdf',
+                isImage: false,
+                dataUrl: null
+            }
+        };
+
+        // Real Local File Reader with dynamic canvas background transparency stripper
+        function removeWhiteBackground(imgElement) {
+            // Check if already processed to avoid infinite loop
+            if (imgElement.dataset.processed === 'true') return;
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const run = () => {
+                const w = imgElement.naturalWidth;
+                const h = imgElement.naturalHeight;
+                if (w === 0 || h === 0) return;
+                
+                canvas.width = w;
+                canvas.height = h;
+                ctx.drawImage(imgElement, 0, 0);
+                
+                try {
+                    const imgData = ctx.getImageData(0, 0, w, h);
+                    const data = imgData.data;
+                    
+                    // Visited array for BFS flood fill
+                    const visited = new Uint8Array(w * h);
+                    const queue = [];
+                    
+                    // Threshold for detecting near-white pixels (e.g. 230 to 255)
+                    const threshold = 230; 
+                    
+                    const checkAndPush = (x, y) => {
+                        if (x < 0 || x >= w || y < 0 || y >= h) return;
+                        const idx = y * w + x;
+                        if (visited[idx]) return;
+                        
+                        const p = idx * 4;
+                        const r = data[p];
+                        const g = data[p+1];
+                        const b = data[p+2];
+                        
+                        // If it's near white, mark as background and make fully transparent
+                        if (r > threshold && g > threshold && b > threshold) {
+                            visited[idx] = 1;
+                            data[p+3] = 0; // Set Alpha channel to 0 (completely transparent)
+                            queue.push(idx);
+                        }
+                    };
+                    
+                    // Start flood-fill from all 4 borders of the image
+                    for (let x = 0; x < w; x++) {
+                        checkAndPush(x, 0);
+                        checkAndPush(x, h - 1);
+                    }
+                    for (let y = 0; y < h; y++) {
+                        checkAndPush(0, y);
+                        checkAndPush(w - 1, y);
+                    }
+                    
+                    // BFS Flood Fill Execution
+                    let head = 0;
+                    while (head < queue.length) {
+                        const idx = queue[head++];
+                        const x = idx % w;
+                        const y = Math.floor(idx / w);
+                        
+                        checkAndPush(x + 1, y);
+                        checkAndPush(x - 1, y);
+                        checkAndPush(x, y + 1);
+                        checkAndPush(x, y - 1);
+                    }
+                    
+                    // Put processed pixels back to canvas
+                    ctx.putImageData(imgData, 0, 0);
+                    
+                    // Mark as processed to prevent infinite load loop
+                    imgElement.dataset.processed = 'true';
+                    
+                    // Update image src to the transparent data URL
+                    imgElement.src = canvas.toDataURL();
+                    
+                    // Remove mixing styles so the image stays bright and colored!
+                    imgElement.classList.remove('mix-blend-multiply');
+                } catch (e) {
+                    console.warn("CORS limitation prevented client-side pixel stripping. Falling back to mix-blend-multiply.", e);
+                    imgElement.classList.add('mix-blend-multiply');
+                }
+            };
+            
+            if (imgElement.complete) {
+                run();
+            } else {
+                imgElement.onload = run;
+            }
+        }
+
+        // Real Local File Reader for Prototyping
+        function handleLocalImageUpload(event, category) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                
+                if (category === 'hero') {
+                    // Update Hero Background instantly
+                    document.getElementById('hero-bg-img').src = dataUrl;
+                    document.getElementById('hero-upload-filename-status').innerHTML = `
+                        <span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> Live geladen: ${file.name}</span>
+                    `;
+                    showToast("Das Schwimmbad-Hintergrundbild wurde erfolgreich durch dein Bild " + file.name + " ersetzt!");
+                } else {
+                    // Update specific category
+                    database[category].filename = file.name;
+                    database[category].dataUrl = dataUrl;
+                    
+                    if (file.type.startsWith('image/')) {
+                        database[category].isImage = true;
+                    } else {
+                        database[category].isImage = false;
+                    }
+                    
+                    updateDynamicTexts();
+                    showToast('"' + file.name + '" wurde geladen und wird jetzt live in der Besucher-Ansicht angezeigt!');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Toggle View: User vs Admin
+        function setView(view) {
+            currentView = view;
+            
+            const btnUser = document.getElementById('btn-user-view');
+            const btnAdmin = document.getElementById('btn-admin-view');
+            const containerUser = document.getElementById('user-view-container');
+            const containerAdmin = document.getElementById('admin-view-container');
+
+            if (view === 'user') {
+                btnUser.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all bg-steiermark-500 text-white flex items-center gap-1.5";
+                btnAdmin.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all text-steiermark-300 hover:text-white flex items-center gap-1.5";
+                containerUser.classList.remove('hidden');
+                containerAdmin.classList.add('hidden');
+            } else {
+                btnAdmin.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all bg-steiermark-500 text-white flex items-center gap-1.5";
+                btnUser.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all text-steiermark-300 hover:text-white flex items-center gap-1.5";
+                containerUser.classList.add('hidden');
+                containerAdmin.classList.remove('hidden');
+            }
+        }
+
+        // Language Switcher DE / SL
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            
+            const btnDe = document.getElementById('lang-de');
+            const btnSl = document.getElementById('lang-sl');
+
+            if (lang === 'de') {
+                btnDe.className = "px-2.5 py-1 rounded bg-white text-steiermark-900 shadow-sm transition-all";
+                btnSl.className = "px-2.5 py-1 rounded text-steiermark-500 hover:text-steiermark-900 transition-all";
+            } else {
+                btnSl.className = "px-2.5 py-1 rounded bg-white text-steiermark-900 shadow-sm transition-all";
+                btnDe.className = "px-2.5 py-1 rounded text-steiermark-500 hover:text-steiermark-900 transition-all";
+            }
+
+            // Translate DOM Elements
+            const translatable = document.querySelectorAll('[data-de]');
+            translatable.forEach(el => {
+                if (lang === 'de') {
+                    el.innerText = el.getAttribute('data-de');
+                } else {
+                    el.innerText = el.getAttribute('data-sl');
+                }
+            });
+
+            // Update Dynamic Texts Based on Simulative Database
+            updateDynamicTexts();
+        }
+
+        // Mobile Hamburger Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        // Update Text Segments that can change dynamically from simulated upload
+        function updateDynamicTexts() {
+            // Safe helper to check existence before setting
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = val;
+            };
+
+            // Update Filenames in User view
+            setText('user-speisekarte-filename', database.speisekarte.filename);
+            setText('user-poolparty-filename', database.poolparty.filename);
+            setText('user-events-filename', database.events.filename);
+            setText('user-eintrittspreise-filename', database.tarife.filename);
+            setText('user-angebote-filename', database.sport_und_erholung.filename);
+            setText('user-kursangebote-filename', database.kursangebote.filename);
+
+            // Admin Panel Filenames
+            setText('admin-speisekarte-filename', database.speisekarte.filename);
+            setText('admin-poolparty-filename', database.poolparty.filename);
+            setText('admin-events-filename', database.events.filename);
+            setText('admin-eintrittspreise-filename', database.tarife.filename);
+            setText('admin-angebote-filename', database.sport_und_erholung.filename);
+            setText('admin-kursangebote-filename', database.kursangebote.filename);
+
+            // Render Speisekarte / PDF / Image Block if uploaded
+            const speisekarteImageContainer = document.getElementById('speisekarte-image-preview-container');
+            const speisekarteMediaPreview = document.getElementById('speisekarte-media-preview');
+            
+            if (speisekarteImageContainer && speisekarteMediaPreview) {
+                if (database.speisekarte.dataUrl) {
+                    speisekarteImageContainer.classList.remove('hidden');
+                    if (database.speisekarte.isImage) {
+                        speisekarteMediaPreview.innerHTML = '<img src="' + database.speisekarte.dataUrl + '" alt="Hochgeladene Speisekarte" class="w-full h-auto rounded-lg shadow-sm max-h-[500px] object-contain" />';
+                    } else {
+                        // Full PDF Display in visitor view!
+                        speisekarteMediaPreview.innerHTML = '<div class="border border-steiermark-200 rounded-xl bg-white p-4 text-center space-y-4"><iframe src="' + database.speisekarte.dataUrl + '" class="w-full h-[450px] border border-steiermark-200 rounded-lg mt-3"></iframe></div>';
+                    }
+                } else {
+                    speisekarteImageContainer.classList.add('hidden');
+                }
+            }
+
+            // Render Poolparty/Event Section (Featuring Uploaded Images / PDFs)
+            const eventData = database.poolparty[currentLanguage];
+            const poolpartyPreviewTarget = document.getElementById('poolparty-preview-target');
+            
+            if (poolpartyPreviewTarget) {
+                if (database.poolparty.dataUrl) {
+                    if (database.poolparty.isImage) {
+                        poolpartyPreviewTarget.innerHTML = '<img id="poolparty-img" src="' + database.poolparty.dataUrl + '" alt="Abende die in Erinnerung bleiben" class="w-full h-48 object-cover object-center group-hover:scale-105 transition-transform duration-300" />';
+                    } else {
+                        poolpartyPreviewTarget.innerHTML = '<div class="bg-steiermark-800 text-white p-4 text-center space-y-2 h-24 flex flex-col justify-center items-center"><div class="text-accent-gold text-2xl"><i class="fa-solid fa-file-pdf"></i></div><p class="text-[10px] text-steiermark-300 truncate max-w-[150px] font-semibold">' + database.poolparty.filename + '</p></div>';
+                    }
+                } else {
+                    poolpartyPreviewTarget.innerHTML = '<img id="poolparty-img" src="poolparty.png" alt="Poolparty Bergbad Retznei" class="w-full h-48 object-cover object-center group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src=\'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80\';" />';
+                }
+            }
+
+            // Render Events Preview If PDF is uploaded
+            const eventsPreviewTarget = document.getElementById('events-preview-target');
+            const eventsPdfIframe = document.getElementById('events-pdf-iframe');
+            if (eventsPreviewTarget && eventsPdfIframe) {
+                if (database.events.dataUrl && !database.events.isImage) {
+                    eventsPreviewTarget.classList.remove('hidden');
+                    eventsPdfIframe.src = database.events.dataUrl;
+                } else {
+                    eventsPreviewTarget.classList.add('hidden');
+                }
+            }
+        }
+
+        // Upload Simulator
+        function simulateUpload(category, type) {
+            // Reset custom dataUrls when simulating defaults
+            database[category].dataUrl = null;
+            database[category].isImage = (category === 'poolparty');
+
+            // Update Database File & Texts dynamically based on action
+            if (category === 'speisekarte') {
+                if (type === 'sommer') {
+                    database.speisekarte.filename = 'schmankerl_karte_sommer_2026.pdf';
+                } else {
+                    database.speisekarte.filename = 'herbstschmankerl_weinstraesse_2026.pdf';
+                }
+            } else if (category === 'poolparty') {
+                if (type === 'sunset') {
+                    database.poolparty.filename = 'poolparty.png';
+                } else if (type === 'kiste') {
+                    database.poolparty.filename = 'kistenfleisch_wirtshaus_juni.jpg';
+                }
+            } else if (category === 'tarife') {
+                if (type === '2026') {
+                    database.tarife.filename = 'badetarife_offiziell_2026.pdf';
+                } else {
+                    database.tarife.filename = 'entwurf_preise_saison_2027.pdf';
+                }
+            } else if (category === 'sport_und_erholung') {
+                if (type === 'swim') {
+                    database.sport_und_erholung.filename = 'swim_clinic_kurse_sommer_2026.pdf';
+                } else {
+                    database.sport_und_erholung.filename = 'volleyball_freizeitangebot_bergbad.pdf';
+                }
+            }
+
+            // Sync texts & filenames instantly
+            updateDynamicTexts();
+
+            // Display Success Toast
+            showToast("Datei wurde erfolgreich in der Kategorie " + category.toUpperCase() + " ausgetauscht! Name der neuen PDF: " + database[category].filename);
+        }
+
+        // Show toast
+        function showToast(message) {
+            const toast = document.getElementById('sim-toast');
+            const toastMsg = document.getElementById('sim-toast-message');
+            toastMsg.innerText = message;
+            toast.classList.remove('hidden');
+            
+            // Auto hide after 6 seconds
+            setTimeout(() => {
+                hideToast();
+            }, 6000);
+        }
+
+        // Hide toast
+        function hideToast() {
+            document.getElementById('sim-toast').classList.add('hidden');
+        }
+
+        // Mock PDF Download / Open Real Uploaded File Dialog
+        function simulatePdfDownload(areaName) {
+            const keyMap = {
+                'Speisenkarte': 'speisekarte',
+                'Poolparty-Flyer': 'poolparty',
+                'Eintrittspreise': 'tarife',
+                'Bad-Infos': 'sport_und_erholung',
+                'Kursangebot-PDF': 'kursangebote',
+                'Events-PDF': 'events'
+            };
+            const dbKey = keyMap[areaName];
+
+            // If the user uploaded a real file (has a dataUrl), open it in a new window!
+            if (database[dbKey] && database[dbKey].dataUrl) {
+                const newWindow = window.open();
+                if (newWindow) {
+                    if (database[dbKey].isImage) {
+                        newWindow.document.write('<html><head><title>Bergbad Retznei - ' + database[dbKey].filename + '</title></head><body style="margin:0; background:#0f2b1d; display:flex; align-items:center; justify-content:center; min-height:100vh;"><img src="' + database[dbKey].dataUrl + '" style="max-width:100%; max-height:100vh; object-fit:contain;" /></body></html>');
+                    } else {
+                        newWindow.document.write('<html><head><title>Bergbad Retznei - ' + database[dbKey].filename + '</title></head><body style="margin:0; background:#0f2b1d; display:flex; align-items:center; justify-content:center; min-height:100vh;"><embed src="' + database[dbKey].dataUrl + '" width="100%" height="100%" type="application/pdf" style="border:none;" /></body></html>');
+                    }
+                } else {
+                    // Fail-safe direct download link if popup is blocked
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = database[dbKey].dataUrl;
+                    downloadLink.download = database[dbKey].filename;
+                    downloadLink.click();
+                    downloadLink.remove();
+                }
+                return;
+            }
+
+            // Fallback for simulation template files
+            const customModal = document.createElement('div');
+            customModal.className = "fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all";
+            customModal.innerHTML = `
+                <div class="bg-white border border-steiermark-200 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 text-steiermark-900">
+                    <div class="flex items-center gap-3 text-accent-gold">
+                        <i class="fa-solid fa-file-arrow-down text-3xl"></i>
+                        <h4 class="text-lg font-black">Simulation: Download läuft</h4>
+                    </div>
+                    <p class="text-xs text-steiermark-700 leading-relaxed font-medium">
+                        Hier öffnet sich in der realen Webseite das vom Pächter hochgeladene PDF-Dokument oder Bild für die Kategorie <strong>${areaName}</strong>. 
+                        Es ist mobil-optimiert und kann direkt am Smartphone des Gastes gespeichert oder ausgedruckt werden.
+                    </p>
+                    <div class="bg-steiermark-100 rounded-xl p-4 text-xs font-mono text-steiermark-800 border border-steiermark-200">
+                        Zieldatei: ${database[dbKey] ? database[dbKey].filename : 'datei.pdf'}
+                    </div>
+                    <div class="flex justify-end pt-2">
+                        <button id="close-modal-btn" class="bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg transition-all shadow">
+                            Schließen
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(customModal);
+            
+            document.getElementById('close-modal-btn').addEventListener('click', () => {
+                customModal.remove();
+            });
+        }
+
+        // Set initial view on load
+        window.onload = function() {
+            setView('user');
+            setLanguage('de');
+        };
+    </script>
+</body>
+</html>
