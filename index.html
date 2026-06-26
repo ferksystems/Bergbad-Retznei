@@ -50,8 +50,15 @@
             background: #2e6f40;
             border-radius: 3px;
         }
+        /* Definiert den präzisen, responsive Einrast-Abstand beim Scrollen für fixierte Header */
         html {
             scroll-behavior: smooth;
+            scroll-padding-top: 150px; 
+        }
+        @media (max-width: 1024px) {
+            html {
+                scroll-padding-top: 105px; 
+            }
         }
     </style>
 </head>
@@ -84,15 +91,15 @@
         <!-- ========================================== -->
         <div id="user-view-container" class="block flex-grow transition-opacity duration-300">
             
-            <!-- STICKY HEADER - Visible on scroll, containing only official Bergbad Retznei wave logo -->
-            <header class="bg-white/95 backdrop-blur-md border-b border-steiermark-200 py-3 px-6 sticky top-[37px] sm:top-[37px] z-40 shadow-sm">
+            <!-- STICKY HEADER - Extremely compact on mobile (py-1.5, px-3, logo h-10) to maximize vertical space -->
+            <header class="bg-white/95 backdrop-blur-md border-b border-steiermark-200 py-1.5 px-3 sm:py-3 sm:px-6 sticky top-[37px] sm:top-[37px] z-40 shadow-sm">
                 <div class="max-w-7xl mx-auto flex justify-between items-center">
                     
                     <!-- Fixed Bad Logo (logo.png) - Web-safe Name -->
                     <a href="#" class="flex items-center gap-4">
                         <img src="logo.png" 
                              alt="Bergbad Retznei Logo" 
-                             class="h-16 sm:h-20 w-auto object-contain"
+                             class="h-10 sm:h-12 md:h-16 lg:h-20 w-auto object-contain"
                              onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/droplets.svg';" />
                         <div class="hidden sm:block">
                             <span class="text-xs uppercase tracking-widest font-black text-steiermark-500 block" data-de="Öffentliches Gemeindebad" data-sl="Javno občinsko kopališče">Öffentliches Gemeindebad</span>
@@ -100,8 +107,8 @@
                         </div>
                     </a>
 
-                    <!-- Anchor Navigation Menu -->
-                    <nav class="hidden md:flex items-center gap-6 text-sm font-extrabold text-steiermark-800">
+                    <!-- Anchor Navigation Menu - Kept hidden on mobile landscapes until 'lg' (1024px) -->
+                    <nav class="hidden lg:flex items-center gap-6 text-sm font-extrabold text-steiermark-800">
                         <a href="#angebot" class="hover:text-steiermark-500 transition-colors" data-de="Angebot" data-sl="Ponudba">Angebot</a>
                         <a href="#restauration" class="hover:text-steiermark-500 transition-colors" data-de="Restauration" data-sl="Gostinstvo">Restauration</a>
                         <a href="#veranstaltungen" class="hover:text-steiermark-500 transition-colors" data-de="Veranstaltungen" data-sl="Dogodki">Veranstaltungen</a>
@@ -122,15 +129,15 @@
                             <span class="hidden sm:inline" data-de="Wirtshaus anrufen" data-sl="Pokliči Gostilno">Wirtshaus anrufen</span>
                         </a>
 
-                        <!-- Mobile Hamburger Button -->
-                        <button onclick="toggleMobileMenu()" class="md:hidden text-steiermark-800 focus:outline-none p-2 rounded-lg hover:bg-steiermark-100">
+                        <!-- Mobile Hamburger Button - Visible up to 'lg' (1024px) to prevent squeezed layouts -->
+                        <button onclick="toggleMobileMenu()" class="lg:hidden text-steiermark-800 focus:outline-none p-2 rounded-lg hover:bg-steiermark-100">
                             <i class="fa-solid fa-bars text-xl"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- Mobile Navigation Tray -->
-                <div id="mobile-menu" class="hidden md:hidden mt-3 pt-3 border-t border-steiermark-100 flex flex-col gap-2 text-sm font-bold text-steiermark-800">
+                <div id="mobile-menu" class="hidden lg:hidden mt-3 pt-3 border-t border-steiermark-100 flex flex-col gap-2 text-sm font-bold text-steiermark-800">
                     <a href="#angebot" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Angebot" data-sl="Ponudba">Angebot</a>
                     <a href="#restauration" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Restauration" data-sl="Gostinstvo">Restauration</a>
                     <a href="#veranstaltungen" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Veranstaltungen" data-sl="Dogodki">Veranstaltungen</a>
@@ -152,7 +159,7 @@
                 </div>
             </div>
 
-            <!-- HERO SECTOR - RADIKALE BEREINIGUNG (Slogan top-right, background right-focused on mobile, bg-white ensures no dark colors blend) -->
+            <!-- HERO SECTOR - RADIKALE BEREINIGUNG (Slogan top-right, background right-focused on mobile, bg-white ensures maximum color brilliance) -->
             <section class="relative bg-white text-white overflow-hidden py-16 sm:py-24" style="isolation: isolate;">
                 <!-- Original Clean Background Image (bergbad_retznei.png) - object-right on mobile ensures pool lady is seen -->
                 <img id="hero-bg-img" 
@@ -347,8 +354,8 @@
                             </button>
                         </div>
 
-                        <!-- Live User Upload Container for Speisekarte (Shows PDF or Image) -->
-                        <div id="speisekarte-image-preview-container" class="hidden border border-steiermark-200 rounded-xl overflow-hidden bg-steiermark-50 p-4 mt-6">
+                        <!-- Live User Upload Container for Speisekarte (Shows PDF or Image) - Optimierter, responsive PDF Container mit Scroll-Schutz -->
+                        <div id="speisekarte-image-preview-container" class="hidden border border-steiermark-200 rounded-xl overflow-hidden bg-white p-2 sm:p-4 mt-6">
                             <div id="speisekarte-media-preview" class="w-full h-auto"></div>
                         </div>
                     </div>
@@ -943,8 +950,13 @@
                     if (database.speisekarte.isImage) {
                         speisekarteMediaPreview.innerHTML = '<img src="' + database.speisekarte.dataUrl + '" alt="Hochgeladene Speisekarte" class="w-full h-auto rounded-lg shadow-sm max-h-[500px] object-contain" />';
                     } else {
-                        // Full PDF Display in visitor view!
-                        speisekarteMediaPreview.innerHTML = '<div class="border border-steiermark-200 rounded-xl bg-white p-4 text-center space-y-4"><iframe src="' + database.speisekarte.dataUrl + '" class="w-full h-[450px] border border-steiermark-200 rounded-lg mt-3"></iframe></div>';
+                        // Full PDF Display in visitor view! Wrapped inside responsive panning container for iOS compatibility
+                        speisekarteMediaPreview.innerHTML = `
+                            <div class="border border-steiermark-200 rounded-xl bg-white p-2 sm:p-4 text-center space-y-4">
+                                <div class="w-full overflow-x-auto rounded-lg border border-steiermark-200" style="-webkit-overflow-scrolling: touch;">
+                                    <iframe src="${database.speisekarte.dataUrl}" class="w-full h-[450px] min-w-[500px] sm:min-w-0" style="border: none;"></iframe>
+                                </div>
+                            </div>`;
                     }
                 } else {
                     speisekarteImageContainer.classList.add('hidden');
@@ -958,12 +970,12 @@
             if (poolpartyPreviewTarget) {
                 if (database.poolparty.dataUrl) {
                     if (database.poolparty.isImage) {
-                        poolpartyPreviewTarget.innerHTML = '<img id="poolparty-img" src="' + database.poolparty.dataUrl + '" alt="Abende die in Erinnerung bleiben" class="w-full h-48 object-cover object-center group-hover:scale-105 transition-transform duration-300" />';
+                        poolpartyPreviewTarget.innerHTML = '<img id="poolparty-img" src="' + database.poolparty.dataUrl + '" alt="Abende die in Erinnerung bleiben" class="w-full h-48 sm:h-72 object-cover object-center group-hover:scale-105 transition-transform duration-300" />';
                     } else {
                         poolpartyPreviewTarget.innerHTML = '<div class="bg-steiermark-800 text-white p-4 text-center space-y-2 h-24 flex flex-col justify-center items-center"><div class="text-accent-gold text-2xl"><i class="fa-solid fa-file-pdf"></i></div><p class="text-[10px] text-steiermark-300 truncate max-w-[150px] font-semibold">' + database.poolparty.filename + '</p></div>';
                     }
                 } else {
-                    poolpartyPreviewTarget.innerHTML = '<img id="poolparty-img" src="poolparty.png" alt="Poolparty Bergbad Retznei" class="w-full h-48 object-cover object-center group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src=\'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80\';" />';
+                    poolpartyPreviewTarget.innerHTML = '<img id="poolparty-img" src="poolparty.png" alt="Poolparty Bergbad Retznei" class="w-full h-48 sm:h-72 object-cover object-center group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src=\'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80\';" />';
                 }
             }
 
@@ -1054,11 +1066,44 @@
             if (database[dbKey] && database[dbKey].dataUrl) {
                 const newWindow = window.open();
                 if (newWindow) {
-                    if (database[dbKey].isImage) {
-                        newWindow.document.write('<html><head><title>Bergbad Retznei - ' + database[dbKey].filename + '</title></head><body style="margin:0; background:#0f2b1d; display:flex; align-items:center; justify-content:center; min-height:100vh;"><img src="' + database[dbKey].dataUrl + '" style="max-width:100%; max-height:100vh; object-fit:contain;" /></body></html>');
-                    } else {
-                        newWindow.document.write('<html><head><title>Bergbad Retznei - ' + database[dbKey].filename + '</title></head><body style="margin:0; background:#0f2b1d; display:flex; align-items:center; justify-content:center; min-height:100vh;"><embed src="' + database[dbKey].dataUrl + '" width="100%" height="100%" type="application/pdf" style="border:none;" /></body></html>');
-                    }
+                    // Full screen layout with viewport meta tag preventing scale compression on mobile browsers
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="utf-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Bergbad Retznei - \${database[dbKey].filename}</title>
+                            <style>
+                                html, body {
+                                    margin: 0;
+                                    padding: 0;
+                                    width: 100%;
+                                    height: 100%;
+                                    background: #0f2b1d;
+                                    overflow: hidden;
+                                    display: block;
+                                }
+                                iframe, img {
+                                    border: none;
+                                    width: 100%;
+                                    height: 100%;
+                                    display: block;
+                                }
+                                img {
+                                    object-fit: contain;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            \${database[dbKey].isImage 
+                                ? \`<img src="\${database[dbKey].dataUrl}" alt="Vorschau" />\` 
+                                : \`<iframe src="\${database[dbKey].dataUrl}"></iframe>\`
+                            }
+                        </body>
+                        </html>
+                    `);
+                    newWindow.document.close();
                 } else {
                     // Fail-safe direct download link if popup is blocked
                     const downloadLink = document.createElement('a');
@@ -1080,11 +1125,11 @@
                         <h4 class="text-lg font-black">Simulation: Download läuft</h4>
                     </div>
                     <p class="text-xs text-steiermark-700 leading-relaxed font-medium">
-                        Hier öffnet sich in der realen Webseite das vom Pächter hochgeladene PDF-Dokument oder Bild für die Kategorie <strong>${areaName}</strong>. 
+                        Hier öffnet sich in der realen Webseite das vom Pächter hochgeladene PDF-Dokument oder Bild für die Kategorie <strong>\${areaName}</strong>. 
                         Es ist mobil-optimiert und kann direkt am Smartphone des Gastes gespeichert oder ausgedruckt werden.
                     </p>
                     <div class="bg-steiermark-100 rounded-xl p-4 text-xs font-mono text-steiermark-800 border border-steiermark-200">
-                        Zieldatei: ${database[dbKey] ? database[dbKey].filename : 'datei.pdf'}
+                        Zieldatei: \${database[dbKey] ? database[dbKey].filename : 'datei.pdf'}
                     </div>
                     <div class="flex justify-end pt-2">
                         <button id="close-modal-btn" class="bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg transition-all shadow">
