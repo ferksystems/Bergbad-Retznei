@@ -825,204 +825,38 @@
             }
         }
 
-        // ==========================================================
-        // GitHub-Konfiguration: hier dein Repo eintragen
-        // ==========================================================
-        const GITHUB_OWNER = 'ferksystems';
-        const GITHUB_REPO = 'Bergbad-Retznei';
-        const GITHUB_BRANCH = 'main'; // ggf. auf 'master' ändern, falls dein Repo das nutzt
-
-        // Admin-Token für diese Browser-Sitzung merken (wird nicht dauerhaft gespeichert)
-        function getAdminPassword() {
-            let token = sessionStorage.getItem('bergbad_gh_token');
-            if (!token) {
-                token = prompt('Bitte GitHub Personal Access Token eingeben (siehe Anleitung):');
-                if (token) sessionStorage.setItem('bergbad_gh_token', token);
-            }
-            return token;
-        }
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    // dataURL hat Format "data:...;base64,XXXX" -> nur den Teil nach dem Komma behalten
-                    resolve(reader.result.split(',')[1]);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function githubApiRequest(path, token, options = {}) {
-            const res = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
-                ...options,
-                headers: {
-                    'Authorization': 'token ' + token,
-                    'Accept': 'application/vnd.github+json',
-                    ...(options.headers || {})
-                }
-            });
-            return res;
-        }
-
-        async function githubGetFileSha(path, token) {
-            const res = await githubApiRequest(`${path}?ref=${GITHUB_BRANCH}`, token);
-            if (res.status === 200) {
-                const data = await res.json();
-                return data.sha;
-            }
-            return null; // Datei existiert noch nicht
-        }
-
-        async function githubPutFile(path, base64Content, message, token, sha) {
-            const body = {
-                message,
-                content: base64Content,
-                branch: GITHUB_BRANCH
-            };
-            if (sha) body.sha = sha;
-
-            const res = await githubApiRequest(path, token, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            return res;
-        }
-
-        // Echter Upload direkt ins GitHub-Repo (dauerhaft, für alle Besucher sichtbar nach Rebuild)
-        async function handleLocalImageUpload(event, category) {
+        // Real Local File Reader for Prototyping
+        function handleLocalImageUpload(event, category) {
             const file = event.target.files[0];
             if (!file) return;
 
-            if (category === 'hero') {
-                // Hero-Hintergrund bleibt vorerst lokale Vorschau (kein eigenes Server-Feld)
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('hero-bg-img').src = e.target.result;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                
+                if (category === 'hero') {
+                    // Update Hero Background instantly
+                    document.getElementById('hero-bg-img').src = dataUrl;
                     document.getElementById('hero-upload-filename-status').innerHTML = `
                         <span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> Live geladen: ${file.name}</span>
                     `;
                     showToast("Das Schwimmbad-Hintergrundbild wurde erfolgreich durch dein Bild " + file.name + " ersetzt!");
-                };
-                reader.readAsDataURL(file);
-                return;
-            }
-
-            const token = getAdminPassword();
-            if (!token) {
-                showToast('Kein Token eingegeben – Upload abgebrochen.');
-                return;
-            }
-
-            const allowedExt = ['pdf', 'png', 'jpg', 'jpeg'];
-            const ext = file.name.split('.').pop().toLowerCase();
-            if (!allowedExt.includes(ext)) {
-                showToast('Nur PDF, PNG oder JPG erlaubt.');
-                return;
-            }
-
-            const isImage = ['png', 'jpg', 'jpeg'].includes(ext);
-            const targetPath = `uploads/${category}.${ext}`;
-
-            showToast('"' + file.name + '" wird hochgeladen ...');
-
-            try {
-                const base64Content = await fileToBase64(file);
-
-                // 1. Alte Versionen mit anderer Endung entfernen (damit nicht zwei Dateien existieren)
-                for (const e of allowedExt) {
-                    if (e === ext) continue;
-                    const oldPath = `uploads/${category}.${e}`;
-                    const oldSha = await githubGetFileSha(oldPath, token);
-                    if (oldSha) {
-                        await githubApiRequest(oldPath, token, {
-                            method: 'DELETE',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                message: `Entferne alte Datei für ${category}`,
-                                sha: oldSha,
-                                branch: GITHUB_BRANCH
-                            })
-                        });
+                } else {
+                    // Update specific category
+                    database[category].filename = file.name;
+                    database[category].dataUrl = dataUrl;
+                    
+                    if (file.type.startsWith('image/')) {
+                        database[category].isImage = true;
+                    } else {
+                        database[category].isImage = false;
                     }
-                }
-
-                // 2. Neue Datei hochladen (erstellen oder überschreiben)
-                const existingSha = await githubGetFileSha(targetPath, token);
-                const putRes = await githubPutFile(
-                    targetPath,
-                    base64Content,
-                    `Upload ${category}: ${file.name}`,
-                    token,
-                    existingSha
-                );
-
-                if (putRes.status !== 200 && putRes.status !== 201) {
-                    if (putRes.status === 401 || putRes.status === 403) {
-                        sessionStorage.removeItem('bergbad_gh_token');
-                    }
-                    const errData = await putRes.json().catch(() => ({}));
-                    showToast('Fehler beim Hochladen: ' + (errData.message || putRes.status));
-                    return;
-                }
-
-                // 3. manifest.json aktualisieren
-                const manifestPath = 'uploads/manifest.json';
-                const manifestSha = await githubGetFileSha(manifestPath, token);
-                let manifest = {};
-                if (manifestSha) {
-                    const manifestRes = await githubApiRequest(`${manifestPath}?ref=${GITHUB_BRANCH}`, token);
-                    const manifestData = await manifestRes.json();
-                    manifest = JSON.parse(atob(manifestData.content));
-                }
-                manifest[category] = {
-                    filename: file.name,
-                    storedAs: `${category}.${ext}`,
-                    isImage: isImage,
-                    updatedAt: new Date().toISOString()
-                };
-                const manifestBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(manifest, null, 2))));
-                await githubPutFile(manifestPath, manifestBase64, `Update manifest: ${category}`, token, manifestSha);
-
-                // 4. Lokal sofort aktualisieren (Vorschau via raw.githubusercontent.com)
-                const rawUrl = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${targetPath}?v=${Date.now()}`;
-                database[category].filename = file.name;
-                database[category].dataUrl = rawUrl;
-                database[category].isImage = isImage;
-
-                updateDynamicTexts();
-                showToast('"' + file.name + '" wurde ins GitHub-Repo hochgeladen! Live auf der Seite sichtbar, sobald GitHub Pages neu gebaut hat (ca. 30-60 Sek.).');
-            } catch (err) {
-                console.error(err);
-                showToast('Verbindungsfehler beim Hochladen. Bitte erneut versuchen.');
-            }
-        }
-
-        // Beim Laden der Seite die bereits gespeicherten Dateien aus dem Repo holen
-        function loadServerFiles() {
-            const manifestUrl = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/uploads/manifest.json?v=${Date.now()}`;
-            fetch(manifestUrl)
-                .then(res => {
-                    if (!res.ok) throw new Error('Kein manifest.json gefunden (noch keine Uploads vorhanden)');
-                    return res.json();
-                })
-                .then(manifest => {
-                    Object.keys(manifest).forEach(category => {
-                        if (database[category]) {
-                            const entry = manifest[category];
-                            const rawUrl = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/uploads/${entry.storedAs}?v=${Date.now()}`;
-                            database[category].filename = entry.filename;
-                            database[category].dataUrl = rawUrl;
-                            database[category].isImage = entry.isImage;
-                        }
-                    });
+                    
                     updateDynamicTexts();
-                })
-                .catch(err => {
-                    console.warn('Konnte gespeicherte Dateien nicht laden:', err.message);
-                });
+                    showToast('"' + file.name + '" wurde geladen und wird jetzt live in der Besucher-Ansicht angezeigt!');
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
         // Toggle View: User vs Admin
@@ -1315,7 +1149,6 @@
         window.onload = function() {
             setView('user');
             setLanguage('de');
-            loadServerFiles();
         };
     </script>
 </body>
