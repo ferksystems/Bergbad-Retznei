@@ -4,5 +4,11 @@
     "storedAs": "speisekarte.pdf",
     "isImage": false,
     "updatedAt": "2026-06-30T12:59:27.854Z"
+  },
+  "tarife": {
+    "filename": "tarife.pdf",
+    "storedAs": "tarife.pdf",
+    "isImage": false,
+    "updatedAt": "2026-06-30T13:00:06.688Z"
   }
 }
