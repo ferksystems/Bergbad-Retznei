@@ -1,14 +1,28 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bergbad Retznei & s'Wirtshaus - Offizielle Webseite</title>
-    <!-- Tailwind CSS -->
+    <!-- Chosen Palette: Natur & Steiermark. Deep Forest Green (#0f2b1d) für Texte/Header, Steiermark Green (#2e6f40) für Aktionen, Warm Gold (#d4af37) für Highlights, Light Moss (#f4f8f4) für Hintergründe. -->
+    
+    <!-- CSS Verzeichnis: Optionale Einbindung für eigene lokale Server-Stylesheets -->
+    <link rel="stylesheet" href="css/custom.css">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome für Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
+        // Globaler Fallback-Handler für das Hero-Bild, falls lokale Dateien fehlen oder Pfade falsch sind
+        function handleHeroError(img) {
+            img.onerror = null; // Endlosschleife verhindern
+            const isMobile = window.innerWidth < 768;
+            if (isMobile) {
+                img.src = 'https://images.unsplash.com/photo-1565120130276-dfbd9a7a3ad7?auto=format&fit=crop&w=800&q=80';
+            } else {
+                img.src = 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1600&q=80';
+            }
+        }
+
         // Sicherheits-Absicherung gegen asynchrone Ladeverzögerungen des Tailwind-CDN
         function configureTailwind() {
             if (typeof tailwind !== 'undefined') {
@@ -17,23 +31,22 @@
                         extend: {
                             colors: {
                                 steiermark: {
-                                    50: '#f4f8f4',  // Sanftes, helles Natur-Grün
-                                    100: '#e3efe2', // Zartes Lindgrün
-                                    200: '#c5dec3', // Mildes Moosgrün
-                                    500: '#2e6f40', // Das klassische steirische Grün (Grünes Herz)
-                                    800: '#1c452b', // Tiefes Waldgrün
-                                    900: '#0f2b1d', // Edles, dunkles Tannengrün
+                                    50: '#f4f8f4',  
+                                    100: '#e3efe2', 
+                                    200: '#c5dec3', 
+                                    500: '#2e6f40', 
+                                    800: '#1c452b', 
+                                    900: '#0f2b1d', 
                                 },
                                 accent: {
-                                    gold: '#d4af37', // Warmes Weinstraßen-Gold für Spezialitäten
-                                    blue: '#3b82f6', // Kristallklares Poolblau für das Bad
+                                    gold: '#d4af37', 
+                                    blue: '#3b82f6', 
                                 }
                             }
                         }
                     }
                 };
             } else {
-                // Erneut versuchen nach einer kurzen Verzögerung
                 setTimeout(configureTailwind, 50);
             }
         }
@@ -50,7 +63,6 @@
             background: #2e6f40;
             border-radius: 3px;
         }
-        /* Definiert den präzisen, responsive Einrast-Abstand beim Scrollen für fixierte Header */
         html {
             scroll-behavior: smooth;
             scroll-padding-top: 150px; 
@@ -64,8 +76,8 @@
 </head>
 <body class="bg-steiermark-50 text-steiermark-900 font-sans min-h-screen flex flex-col custom-scroll">
 
-    <!-- TOP BAR: Simulation Selector (Only visible for prototype evaluation) -->
-    <div class="bg-steiermark-900 text-white py-2 px-4 sticky top-0 z-50 shadow-md border-b border-steiermark-500/20 text-xs">
+    <!-- TOP BAR: Simulations-Auswahl (Standardmäßig über JS 'hidden' und nur via URL-Parameter ?admin sichtbar) -->
+    <div id="top-simulation-bar" class="bg-steiermark-900 text-white py-2 px-4 sticky top-0 z-50 shadow-md border-b border-steiermark-500/20 text-xs font-sans hidden">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
             <div class="flex items-center gap-2">
                 <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -76,9 +88,31 @@
                 <button id="btn-user-view" onclick="setView('user')" class="px-2.5 py-1 rounded text-xs font-bold transition-all bg-steiermark-500 text-white flex items-center gap-1">
                     <i class="fa-solid fa-eye"></i> <span data-de="Besucher-Ansicht" data-sl="Pogled obiskovalca">Besucher-Ansicht</span>
                 </button>
-                <button id="btn-admin-view" onclick="setView('admin')" class="px-2.5 py-1 rounded text-xs font-bold transition-all text-steiermark-300 hover:text-white flex items-center gap-1">
+                <button id="btn-admin-view" onclick="triggerAdminAuth()" class="px-2.5 py-1 rounded text-xs font-bold transition-all text-steiermark-300 hover:text-white flex items-center gap-1">
                     <i class="fa-solid fa-sliders"></i> <span data-de="Pächter-Dashboard (Admin)" data-sl="Nadzorna plošča">Pächter-Dashboard (Admin)</span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD LOGIN MODAL -->
+    <div id="admin-auth-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border border-steiermark-200 rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl space-y-4">
+            <div class="text-center space-y-2">
+                <div class="bg-steiermark-100 text-steiermark-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto text-xl">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-lg font-black text-steiermark-900" data-de="Pächter-Login" data-sl="Prijava za najemnika">Pächter-Login</h3>
+                <p class="text-xs text-steiermark-500" data-de="Bitte gib das Kennwort ein, um fortzufahren." data-sl="Prosimo vnesite geslo za nadaljevanje.">Bitte gib das Kennwort ein, um fortzufahren.</p>
+                <p class="text-[10px] text-accent-gold font-bold" data-de="Hinweis für Testzwecke: retznei2026" data-sl="Geslo za test: retznei2026">Hinweis für Testzwecke: retznei2026</p>
+            </div>
+            <div class="space-y-3">
+                <input type="password" id="admin-password-input" class="w-full px-4 py-2.5 rounded-lg border border-steiermark-200 text-sm focus:outline-none focus:ring-2 focus:ring-steiermark-500 text-center font-bold tracking-widest text-black" placeholder="••••••••">
+                <p id="auth-error-msg" class="text-xs text-red-600 font-bold text-center hidden" data-de="Falsches Kennwort!" data-sl="Napačno geslo!">Falsches Kennwort!</p>
+                <div class="flex gap-2">
+                    <button onclick="cancelAdminAuth()" class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold text-xs py-2.5 rounded-lg transition-all" data-de="Abbrechen" data-sl="Prekliči">Abbrechen</button>
+                    <button onclick="submitAdminAuth()" class="w-1/2 bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs py-2.5 rounded-lg transition-all" data-de="Anmelden" data-sl="Prijava">Anmelden</button>
+                </div>
             </div>
         </div>
     </div>
@@ -87,17 +121,17 @@
     <main class="flex-grow flex flex-col">
         
         <!-- ========================================== -->
-        <!-- VIEW A: PUBLIC VISITOR WEBSITE             -->
+        <!-- VIEW A: ÖFFENTLICHE BESUCHERANSICHT        -->
         <!-- ========================================== -->
         <div id="user-view-container" class="block flex-grow transition-opacity duration-300">
             
-            <!-- STICKY HEADER - Extremely compact on mobile (py-1.5, px-3, logo h-10) to maximize vertical space -->
-            <header class="bg-white/95 backdrop-blur-md border-b border-steiermark-200 py-1.5 px-3 sm:py-3 sm:px-6 sticky top-[37px] sm:top-[37px] z-40 shadow-sm">
+            <!-- STICKY HEADER - Position 'top' wird dynamisch per JS gesteuert -->
+            <header id="main-navigation-header" class="bg-white/95 backdrop-blur-md border-b border-steiermark-200 py-1.5 px-3 sm:py-3 sm:px-6 sticky top-0 z-40 shadow-sm transition-all duration-300">
                 <div class="max-w-7xl mx-auto flex justify-between items-center">
                     
-                    <!-- Fixed Bad Logo (logo.png) - Web-safe Name -->
+                    <!-- Bad Logo (images/logo.png) -->
                     <a href="#" class="flex items-center gap-4">
-                        <img src="logo.png" 
+                        <img src="images/logo.png" 
                              alt="Bergbad Retznei Logo" 
                              class="h-10 sm:h-12 md:h-16 lg:h-20 w-auto object-contain"
                              onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/droplets.svg';" />
@@ -107,47 +141,47 @@
                         </div>
                     </a>
 
-                    <!-- Anchor Navigation Menu - Kept hidden on mobile landscapes until 'lg' (1024px) -->
+                    <!-- Hauptmenü Navigation -->
                     <nav class="hidden lg:flex items-center gap-6 text-sm font-extrabold text-steiermark-800">
                         <a href="#angebot" class="hover:text-steiermark-500 transition-colors" data-de="Angebot" data-sl="Ponudba">Angebot</a>
                         <a href="#restauration" class="hover:text-steiermark-500 transition-colors" data-de="Restauration" data-sl="Gostinstvo">Restauration</a>
                         <a href="#veranstaltungen" class="hover:text-steiermark-500 transition-colors" data-de="Veranstaltungen" data-sl="Dogodki">Veranstaltungen</a>
+                        <a href="#galerie" class="hover:text-steiermark-500 transition-colors" data-de="Fotogalerie" data-sl="Galerija">Fotogalerie</a>
                         <a href="#impressum" class="hover:text-steiermark-500 transition-colors" data-de="Impressum" data-sl="Impressum">Impressum</a>
                     </nav>
 
-                    <!-- Language and Reservation -->
+                    <!-- Sprache & Direktanruf -->
                     <div class="flex items-center gap-3">
-                        <!-- Lang Toggle -->
                         <div class="flex bg-steiermark-100 p-0.5 rounded border border-steiermark-200 text-xs font-bold">
                             <button onclick="setLanguage('de')" id="lang-de" class="px-2 py-1 rounded bg-white text-steiermark-900 shadow-sm transition-all">DE</button>
                             <button onclick="setLanguage('sl')" id="lang-sl" class="px-2 py-1 rounded text-steiermark-500 hover:text-steiermark-900 transition-all">SL</button>
                         </div>
 
-                        <!-- Quick Call Table Reservation -->
                         <a href="tel:+436645808000" class="bg-accent-gold hover:bg-amber-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-full transition-all flex items-center gap-1.5 shadow-sm">
                             <i class="fa-solid fa-phone"></i>
                             <span class="hidden sm:inline" data-de="Wirtshaus anrufen" data-sl="Pokliči Gostilno">Wirtshaus anrufen</span>
                         </a>
 
-                        <!-- Mobile Hamburger Button - Visible up to 'lg' (1024px) to prevent squeezed layouts -->
+                        <!-- Mobile Hamburger Button - Visible up to 'lg' -->
                         <button onclick="toggleMobileMenu()" class="lg:hidden text-steiermark-800 focus:outline-none p-2 rounded-lg hover:bg-steiermark-100">
                             <i class="fa-solid fa-bars text-xl"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mobile Navigation Tray -->
+                <!-- Mobiles Aufklapp-Menü -->
                 <div id="mobile-menu" class="hidden lg:hidden mt-3 pt-3 border-t border-steiermark-100 flex flex-col gap-2 text-sm font-bold text-steiermark-800">
                     <a href="#angebot" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Angebot" data-sl="Ponudba">Angebot</a>
                     <a href="#restauration" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Restauration" data-sl="Gostinstvo">Restauration</a>
                     <a href="#veranstaltungen" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Veranstaltungen" data-sl="Dogodki">Veranstaltungen</a>
+                    <a href="#galerie" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Fotogalerie" data-sl="Galerija">Fotogalerie</a>
                     <a href="#impressum" onclick="toggleMobileMenu()" class="block py-2 px-3 hover:bg-steiermark-50 rounded" data-de="Impressum" data-sl="Impressum">Impressum</a>
                 </div>
             </header>
 
-            <!-- Live Status Banner -->
+            <!-- Statusleiste -->
             <div class="bg-steiermark-500 text-white py-1.5 px-6">
-                <div class="max-w-7xl mx-auto flex justify-between items-center text-xs font-bold">
+                <div class="max-w-7xl mx-auto flex justify-between items-center text-xs font-bold font-sans">
                     <div class="flex items-center gap-1.5">
                         <i class="fa-solid fa-cloud-sun text-accent-gold"></i>
                         <span data-de="Freibad geöffnet: Täglich 09:00 - 20:00 Uhr" data-sl="Kopališče odprto: Vsak dan 09:00 - 20:00">Freibad geöffnet: Täglich 09:00 - 20:00 Uhr</span>
@@ -159,42 +193,40 @@
                 </div>
             </div>
 
-            <!-- HERO SECTOR - RADIKALE BEREINIGUNG (Slogan top-right, background right-focused on mobile, bg-white ensures maximum color brilliance) -->
+            <!-- HERO SECTOR - RESPONSIVES GERÄTESPEZIFISCHES BILD -->
             <section class="relative bg-white text-white overflow-hidden py-16 sm:py-24" style="isolation: isolate;">
-                <!-- Original Clean Background Image (bergbad_retznei.png) - object-right on mobile ensures pool lady is seen -->
+                <!-- Responsive Hero Bild via JS gesteuert -->
                 <img id="hero-bg-img" 
-                     src="bergbad_retznei.png" 
+                     src="images/bergbad_retznei_desktop.png" 
                      alt="Bergbad Retznei Panorama" 
                      class="absolute inset-0 w-full h-full object-cover object-right sm:object-center"
                      style="z-index: -2;"
-                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1600&q=80';" />
+                     onerror="handleHeroError(this);" />
                 
-                <!-- Kein verdunkelnder/grüner Overlay mehr. Nur nacktes, helles Bild für maximale Farbbrillanz -->
+                <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/60" style="z-index: -1;"></div>
                 
-                <!-- Layout-Adjustment: Container with alignment structure -->
                 <div class="relative max-w-7xl mx-auto px-8 z-10 flex flex-col justify-center min-h-[350px] sm:min-h-[450px]">
                     
-                    <!-- Grid System to place the Logo Right-of-center -->
-                    <div class="w-full grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                        <div class="hidden md:block md:col-span-5"></div>
-                        
-                        <!-- Slogan Logo (slogan.png): rechts von der Mitte (col-span-7), kleiner & transparent (PNG Transparenz dank automatischem JS-Hintergrundentferner) -->
-                        <div class="col-span-12 md:col-span-7 flex justify-center md:justify-end">
-                            <img id="slogan-img"
-                                 src="slogan.png" 
-                                 alt="Freizeit über den Dächern der Südsteiermark" 
-                                 class="w-full max-w-[280px] sm:max-w-xs md:max-w-sm h-auto object-contain drop-shadow-xl mix-blend-multiply bg-transparent"
-                                 onload="removeWhiteBackground(this)"
-                                 onerror="this.onerror=null; this.src='slogan.jpg'; this.onload=function(){ removeWhiteBackground(this); }; this.onerror=function(){ this.style.display='none'; document.getElementById('fallback-slogan-text').classList.remove('hidden'); };" />
-                            
-                            <!-- Robuster Text-Fallback falls beide Bilder nicht gefunden werden -->
-                            <div id="fallback-slogan-text" class="hidden text-center md:text-right py-4">
-                                <h2 class="text-3xl sm:text-4xl font-black italic text-white drop-shadow-lg" data-de="Freizeit über den Dächern der Südsteiermark" data-sl="Prosti čas nad strehami Južne Štajerske">Freizeit über den Dächern der Südsteiermark</h2>
+                    <!-- Dynamischer Slogan Bereich -->
+                    <div class="w-full flex justify-center md:justify-end pt-4">
+                        <div class="max-w-[280px] sm:max-w-xs md:max-w-md transition-all duration-300">
+                            <!-- Standard-Grafik-Slogan oder dynamischer Text-Renderer -->
+                            <div id="slogan-container" class="w-full">
+                                <img id="slogan-img"
+                                     src="images/slogan.png" 
+                                     alt="Freizeit über den Dächern der Südsteiermark" 
+                                     class="w-full h-auto object-contain drop-shadow-xl mix-blend-multiply bg-transparent"
+                                     onload="removeWhiteBackground(this)"
+                                     onerror="this.onerror=null; this.src='images/slogan.jpg'; this.onload=function(){ removeWhiteBackground(this); }; this.onerror=function(){ this.style.display='none'; document.getElementById('fallback-slogan-text').classList.remove('hidden'); };" />
+                            </div>
+                            <!-- Benutzerdefinierter Text-Slogan Fallback -->
+                            <div id="fallback-slogan-text" class="hidden text-center md:text-right py-4 bg-steiermark-500/95 text-white p-4 rounded-xl border-2 border-accent-gold shadow-2xl">
+                                <h2 id="custom-slogan-text-target" class="text-xl sm:text-2xl font-black italic drop-shadow-lg tracking-wide uppercase text-orange-500">Freizeit über den Dächern der Südsteiermark</h2>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Call-to-actions mittig (center) angeordnet -->
+                    <!-- Call-to-actions -->
                     <div class="w-full flex flex-wrap justify-center gap-4 pt-10">
                         <a href="#angebot" class="bg-white/95 text-steiermark-900 font-extrabold text-xs px-6 py-3.5 rounded-lg hover:bg-white transition-all shadow-lg flex items-center gap-2">
                             <i class="fa-solid fa-umbrella-beach text-accent-blue"></i>
@@ -209,7 +241,7 @@
             </section>
 
             <!-- ========================================== -->
-            <!-- SECTION 1: ANGEBOT                         -->
+            <!-- SEKTION 1: ANGEBOT                         -->
             <!-- ========================================== -->
             <section id="angebot" class="py-20 bg-white border-b border-steiermark-200">
                 <div class="max-w-6xl mx-auto px-6">
@@ -219,15 +251,14 @@
                         <div class="h-1 w-16 bg-accent-gold mx-auto rounded-full"></div>
                     </div>
 
-                    <!-- Angebot Cards: Eintrittspreise (Links), Gäste und Freizeitinfrastruktur (Mitte), Schwimmkurse für Kinder und Erwachsene (Rechts) -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         
-                        <!-- Linkes Element: Eintrittspreise -->
+                        <!-- Eintrittspreise -->
                         <div class="border border-steiermark-200 rounded-2xl p-6 bg-steiermark-50 flex flex-col justify-between space-y-6">
                             <div>
                                 <div class="flex items-center justify-between mb-4">
                                     <span class="bg-accent-blue/15 text-accent-blue text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" data-de="TARIFE" data-sl="CENIK">TARIFE</span>
-                                    <span class="text-xs font-bold text-steiermark-500" id="user-eintrittspreise-filename">tarife.pdf</span>
+                                    <span class="text-xs font-bold text-steiermark-500" id="user-eintrittspreise-filename">documents/tarife.pdf</span>
                                 </div>
                                 <h3 class="text-lg font-black text-steiermark-900" data-de="Eintrittspreise" data-sl="Vstopnice & Cene">Eintrittspreise</h3>
                                 <p class="text-xs text-steiermark-600 mt-2" data-de="Eintrittskarten sind für Retznei & Ehrenhausen gültig:" data-sl="Vstopnice veljajo za kopališču v Retzneju in Ehrenhausnu:">
@@ -260,12 +291,12 @@
                             </button>
                         </div>
 
-                        <!-- Mittleres Element: Gäste und Freizeitinfrastruktur -->
+                        <!-- Gäste und Freizeitinfrastruktur -->
                         <div class="border border-steiermark-200 rounded-2xl p-6 bg-steiermark-50 flex flex-col justify-between space-y-6">
                             <div>
                                 <div class="flex items-center justify-between mb-4">
                                     <span class="bg-steiermark-200 text-steiermark-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" data-de="Sport & Erholung" data-sl="Šport in sprostitev">Sport & Erholung</span>
-                                    <span class="text-xs font-bold text-steiermark-500" id="user-angebote-filename">sport_und_erholung.pdf</span>
+                                    <span class="text-xs font-bold text-steiermark-500" id="user-angebote-filename">documents/sport_und_erholung.pdf</span>
                                 </div>
                                 <h3 class="text-lg font-black text-steiermark-900" data-de="Gäste und Freizeitinfrastruktur" data-sl="Zabava & Rekreacija">Gäste und Freizeitinfrastruktur</h3>
                                 <p class="text-xs text-steiermark-600 mt-2" data-de="Unser kleines, gemütliches Familienbad überzeugt durch Vielfalt am Rosenberg:" data-sl="Naše prijetno družinsko kopališče ponuja številne športne aktivnosti:">
@@ -278,7 +309,6 @@
                                     <li class="flex items-center gap-2"><i class="fa-solid fa-sun text-accent-gold"></i> <span data-de="Großzügige, ruhige Hang-Liegewiesen" data-sl="Veliki mirni travniki za sončenje">Großzügige, ruhige Hang-Liegewiesen</span></li>
                                 </ul>
 
-                                <!-- Hidden Details / Beachvolleyball Accordion -->
                                 <div class="mt-4 pt-3 border-t border-steiermark-200">
                                     <details class="group text-xs text-steiermark-600 cursor-pointer">
                                         <summary class="font-bold flex items-center justify-between text-steiermark-800">
@@ -299,16 +329,16 @@
                             </button>
                         </div>
 
-                        <!-- Rechte Position: Schwimmkurse für Kinder und Erwachsene -->
+                        <!-- Schwimmkurse für Kinder und Erwachsene -->
                         <div class="border border-steiermark-200 rounded-2xl p-6 bg-steiermark-50 flex flex-col justify-between space-y-6">
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between">
                                     <span class="bg-accent-blue/15 text-accent-blue text-[10px] font-black px-2.5 py-1 rounded-full uppercase" data-de="Kursangebot" data-sl="Plavalni tečaji">Kursangebot</span>
-                                    <span class="text-xs font-bold text-steiermark-500" id="user-kursangebote-filename">kursangebote.pdf</span>
+                                    <span class="text-xs font-bold text-steiermark-500" id="user-kursangebote-filename">documents/kursangebote.pdf</span>
                                 </div>
                                 <h3 class="text-lg font-black text-steiermark-900" data-de="Schwimmkurse für Kinder und Erwachsene" data-sl="Tečaji plavanja - SWIM CLINIC">Schwimmkurse für Kinder und Erwachsene</h3>
                                 <p class="text-xs text-steiermark-600 leading-relaxed"
-                                   data-de="Das erfahener Team der SWIM CLINIC bietet regelmäßig strukturierte Kurse in den Sommermonaten im Bergbad Retznei an. Geeignet für Anfänger und Fortgeschrittene."
+                                   data-de="Das erfahrene Team der SWIM CLINIC bietet regelmäßig strukturierte Kurse in den Sommermonaten im Bergbad Retznei an. Geeignet für Anfänger und Fortgeschrittene."
                                    data-sl="Ekipa SWIM CLINIC pripravlja poletne tečaje plavanja za otroke in odrasle v gorskem kopališču Retznei. Primerno za začetnike in nadaljevalce.">
                                     Das erfahrene Team der SWIM CLINIC bietet regelmäßig strukturierte Kurse in den Sommermonaten im Bergbad Retznei an. Geeignet für Anfänger und Fortgeschrittene.
                                 </p>
@@ -325,7 +355,7 @@
             </section>
 
             <!-- ========================================== -->
-            <!-- SECTION 2: RESTAURATION (s'Wirtshaus)     -->
+            <!-- SEKTION 2: RESTAURATION (s'Wirtshaus)     -->
             <!-- ========================================== -->
             <section id="restauration" class="py-20 bg-steiermark-50 border-b border-steiermark-200">
                 <div class="max-w-4xl mx-auto px-6">
@@ -347,16 +377,12 @@
                         </p>
 
                         <!-- Speisekarte Button -->
-                        <div class="flex justify-center">
-                            <button onclick="simulatePdfDownload('Speisenkarte')" class="bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-sm px-8 py-3 rounded-lg transition-all flex items-center gap-2 shadow-md">
-                                <i class="fa-solid fa-file-pdf"></i>
-                                <span data-de="Speisekarte öffnen (PDF)" data-sl="Odpri cenik (PDF)">Speisekarte öffnen (PDF)</span>
+                        <div class="flex flex-col items-center justify-center space-y-2">
+                            <button onclick="simulatePdfDownload('Speisenkarte')" class="bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-base px-10 py-4 rounded-xl transition-all flex items-center gap-3 shadow-md transform hover:scale-105 duration-200">
+                                <i class="fa-solid fa-file-pdf text-xl"></i>
+                                <span data-de="Speisekarte öffnen (PDF)" data-sl="Odpri speisekarte (PDF)">Speisekarte öffnen (PDF)</span>
                             </button>
-                        </div>
-
-                        <!-- Live User Upload Container for Speisekarte (Shows PDF or Image) - Optimierter, responsive PDF Container mit Scroll-Schutz -->
-                        <div id="speisekarte-image-preview-container" class="hidden border border-steiermark-200 rounded-xl overflow-hidden bg-white p-2 sm:p-4 mt-6">
-                            <div id="speisekarte-media-preview" class="w-full h-auto"></div>
+                            <span class="text-xs font-semibold text-steiermark-500" id="user-speisekarte-filename">documents/speisekarte.pdf</span>
                         </div>
                     </div>
 
@@ -381,7 +407,7 @@
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between">
                                     <span class="bg-red-100 text-red-700 text-[10px] font-black px-2.5 py-1 rounded-full uppercase" data-de="POOLPARTY" data-sl="POOLPARTY">POOLPARTY</span>
-                                    <span class="text-xs font-bold text-steiermark-500" id="user-poolparty-filename">poolparty.png</span>
+                                    <span class="text-xs font-bold text-steiermark-500" id="user-poolparty-filename">images/poolparty.png</span>
                                 </div>
                                 <h3 class="text-xl font-black text-steiermark-900" data-de="Poolpartys" data-sl="Zabave ob bazenu">Poolpartys</h3>
                                 <p class="text-xs text-steiermark-600 leading-relaxed"
@@ -390,12 +416,12 @@
                                     Genieße romantisches Nachtbaden bis 22 Uhr bei Kerzenschein und stimmungsvoller Musik unterm Sternenhimmel.
                                 </p>
                                 
-                                <!-- Poolparty-Bild Container - Höhe auf h-48 verdoppelt (doppelt so hoch wie h-24) -->
+                                <!-- Poolparty-Bild Container -->
                                 <div id="poolparty-preview-target" class="rounded-lg overflow-hidden border border-steiermark-200 shadow-sm relative group">
                                     <img id="poolparty-img" 
-                                         src="poolparty.png" 
+                                         src="images/poolparty.png" 
                                          alt="Poolparty Bergbad Retznei" 
-                                         class="w-full h-48 object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                         class="w-full h-48 sm:h-72 object-cover object-center group-hover:scale-105 transition-transform duration-300"
                                          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80';" />
                                 </div>
                             </div>
@@ -410,7 +436,7 @@
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between mb-4">
                                     <span class="bg-accent-gold/15 text-accent-gold text-[10px] font-black px-2.5 py-1 rounded-full uppercase" data-de="Events" data-sl="Events">Events</span>
-                                    <span class="text-xs font-bold text-steiermark-500" id="user-events-filename">events.pdf</span>
+                                    <span class="text-xs font-bold text-steiermark-500" id="user-events-filename">documents/events.pdf</span>
                                 </div>
                                 <h3 class="text-xl font-black text-steiermark-900" data-de="Events" data-sl="Dogodki & Druženje">Events</h3>
                                 <p class="text-xs text-steiermark-600 leading-relaxed"
@@ -421,7 +447,7 @@
                                 
                                 <!-- Display Area for Events PDF / Image -->
                                 <div id="events-preview-target" class="hidden border border-steiermark-200 rounded-xl bg-white p-4 text-center space-y-3">
-                                    <div class="text-steiermark-500 text-3xl"><i class="fa-solid fa-file-pdf"></i></div>
+                                    <div class="text-steiermark-50 text-3xl"><i class="fa-solid fa-file-pdf"></i></div>
                                     <iframe id="events-pdf-iframe" src="" class="w-full h-[150px] border border-steiermark-100 rounded-lg"></iframe>
                                 </div>
                             </div>
@@ -437,12 +463,31 @@
             </section>
 
             <!-- ========================================== -->
-            <!-- SECTION 4: IMPRESSUM & FOOTER              -->
+            <!-- SECTION 4: FOTOGALERIE                     -->
+            <!-- ========================================== -->
+            <section id="galerie" class="py-20 bg-steiermark-100 border-b border-steiermark-200">
+                <div class="max-w-6xl mx-auto px-6">
+                    <div class="text-center space-y-2 mb-12">
+                        <span class="text-xs font-bold text-steiermark-500 uppercase tracking-widest" data-de="Impressionen" data-sl="Vtis">Impressionen</span>
+                        <h2 class="text-3xl sm:text-4xl font-black text-steiermark-900" data-de="Fotogalerie Bergbad & Wirtshaus" data-sl="Fotogalerija">Fotogalerie Bergbad & Wirtshaus</h2>
+                        <div class="h-1 w-16 bg-accent-gold mx-auto rounded-full"></div>
+                    </div>
+
+                    <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                </div>
+            </section>
+
+            <div id="lightbox-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4 cursor-pointer" onclick="closeLightbox()">
+                <button class="absolute top-4 right-4 text-white text-3xl hover:text-accent-gold transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                <img id="lightbox-img" src="" alt="Lightbox View" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl">
+            </div>
+
+            <!-- ========================================== -->
+            <!-- SECTION 5: IMPRESSUM & FOOTER              -->
             <!-- ========================================== -->
             <footer id="impressum" class="bg-steiermark-900 text-steiermark-100 py-16 px-6 border-t border-steiermark-500/20">
-                <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-sm">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-sm font-sans">
                     
-                    <!-- Contact / Legal -->
                     <div class="space-y-4">
                         <h4 class="font-black text-white text-lg" data-de="Impressum & Kontakt" data-sl="Kontakti & Podatki">Impressum & Kontakt</h4>
                         <div class="space-y-2 text-xs font-semibold text-steiermark-300 leading-relaxed">
@@ -454,7 +499,6 @@
                         </div>
                     </div>
 
-                    <!-- Ownership Note -->
                     <div class="space-y-4">
                         <h4 class="font-black text-white text-lg" data-de="Gemeinde Ehrenhausen" data-sl="Občina Ehrenhausen">Gemeinde Ehrenhausen</h4>
                         <p class="text-xs text-steiermark-300 leading-relaxed font-medium"
@@ -464,7 +508,6 @@
                         </p>
                     </div>
 
-                    <!-- Open Hours -->
                     <div class="space-y-4">
                         <h4 class="font-black text-white text-lg" data-de="Saisonale Betriebszeiten" data-sl="Delovni chal">Saisonale Betriebszeiten</h4>
                         <div class="space-y-2 text-xs font-semibold text-steiermark-300">
@@ -486,7 +529,7 @@
 
 
         <!-- ========================================== -->
-        <!-- VIEW B: PÄCHTER-DASHBOARD (ADMIN PANEL)    -->
+        <!-- VIEW B: SECURED PÄCHTER-DASHBOARD          -->
         <!-- ========================================== -->
         <div id="admin-view-container" class="hidden flex-grow bg-steiermark-100 py-12 px-6">
             <div class="max-w-4xl mx-auto space-y-8">
@@ -502,12 +545,17 @@
                             <p class="text-xs text-steiermark-500 font-semibold" data-de="Absolute Synchronisierung aller Dokumente und Bezeichnungen" data-sl="Sinhronizacija dokumentov">Absolute Synchronisierung aller Dokumente und Bezeichnungen</p>
                         </div>
                     </div>
-                    <div class="bg-steiermark-100 border border-steiermark-200 rounded-lg px-4 py-2 text-xs font-bold text-steiermark-800">
-                        <i class="fa-solid fa-user-gear mr-1 text-steiermark-500"></i> Hallo, Doroteja Korošec!
+                    <div class="flex items-center gap-3">
+                        <div class="bg-steiermark-100 border border-steiermark-200 rounded-lg px-4 py-2 text-xs font-bold text-steiermark-800">
+                            <i class="fa-solid fa-user-gear mr-1 text-steiermark-500"></i> Doroteja Korošec
+                        </div>
+                        <button onclick="logoutAdmin()" class="bg-red-500 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-black transition-all flex items-center gap-1">
+                            <i class="fa-solid fa-right-from-bracket"></i> <span data-de="Abmelden" data-sl="Odjava">Abmelden</span>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Strategic Explanation Alert -->
+                <!-- Info Alert -->
                 <div class="bg-emerald-50 border-l-4 border-steiermark-500 p-5 rounded-r-xl space-y-2">
                     <h4 class="font-extrabold text-sm text-steiermark-800"><i class="fa-solid fa-circle-info"></i> Synchronisierte Datei-Wartung:</h4>
                     <p class="text-xs text-steiermark-900 leading-relaxed font-medium">
@@ -520,43 +568,101 @@
                     <div class="flex justify-between items-start">
                         <div class="flex items-center gap-2">
                             <span class="bg-accent-gold/10 text-accent-gold p-2 rounded-lg text-sm"><i class="fa-solid fa-image"></i></span>
-                            <h4 class="font-black text-base text-steiermark-900">Hero-Hintergrundbild des Schwimmbads</h4>
+                            <h4 class="font-black text-base text-steiermark-900">Hero-Hintergrundbild (Landscape & Portrait)</h4>
                         </div>
-                        <span class="text-[10px] bg-accent-gold/25 text-amber-800 px-2.5 py-1 rounded-full font-black uppercase">Dateiname: bergbad_retznei.png</span>
+                        <span class="text-[10px] bg-accent-gold/25 text-amber-800 px-2.5 py-1 rounded-full font-black uppercase">Automatisches Device-Routing</span>
                     </div>
-                    <p class="text-xs text-steiermark-600 font-medium">
-                        Lade hier das generierte Hauptbild deines Schwimmbads hoch, damit es großflächig hinter der Überschrift der Startseite angezeigt wird.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4 items-center bg-steiermark-50 p-4 rounded-xl border border-steiermark-200">
-                        <!-- Custom File Input styled as Premium Button -->
-                        <label class="w-full sm:w-auto bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-5 py-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer shrink-0">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            <span>Bild auswählen &amp; hochladen</span>
-                            <input type="file" class="hidden" accept="image/*" onchange="handleLocalImageUpload(event, 'hero')">
-                        </label>
-                        <div class="text-[11px] text-steiermark-600 font-semibold" id="hero-upload-filename-status">
-                            bergbad_retznei.png (Standard verwendet)
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-steiermark-50 p-4 rounded-xl border border-steiermark-200 space-y-2">
+                            <p class="text-xs font-bold text-steiermark-800">Desktop-Version (images/bergbad_retznei_desktop.png)</p>
+                            <label class="w-full bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span>Desktop-Bild hochladen</span>
+                                <input type="file" class="hidden" accept="image/*" onchange="handleDeviceHeroUpload(event, 'desktop')">
+                            </label>
+                            <p class="text-[10px] text-steiermark-600 truncate font-semibold" id="admin-hero-desktop-filename">images/bergbad_retznei_desktop.png (Standard)</p>
+                        </div>
+                        <div class="bg-steiermark-50 p-4 rounded-xl border border-steiermark-200 space-y-2">
+                            <p class="text-xs font-bold text-steiermark-800">Mobil-Version (images/bergbad_retznei_mobile.png)</p>
+                            <label class="w-full bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span>Mobil-Bild hochladen</span>
+                                <input type="file" class="hidden" accept="image/*" onchange="handleDeviceHeroUpload(event, 'mobile')">
+                            </label>
+                            <p class="text-[10px] text-steiermark-600 truncate font-semibold" id="admin-hero-mobile-filename">images/bergbad_retznei_mobile.png (Standard)</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- FILE SIMULATOR GRID (Strictly aligned to Frontend nomenclature) -->
+                <!-- DYNAMIC HERO SLOGAN CARD -->
+                <div class="bg-white rounded-2xl border border-steiermark-200 p-6 space-y-4 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-steiermark-100 text-steiermark-50 p-2 rounded-lg text-sm"><i class="fa-solid fa-pen-nib"></i></span>
+                            <h4 class="font-black text-base text-steiermark-900">Slogan-Textdatei hochladen</h4>
+                        </div>
+                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">documents/SLOGAN_TEXT.txt</span>
+                    </div>
+                    <p class="text-xs text-steiermark-600 leading-relaxed font-semibold">
+                        Laden Sie eine einfache Textdatei hoch, um einen tagesaktuellen Slogan über dem Pool zu platzieren (z.B. „Heute Grillabend am Rosenberg!“). Wird die Datei entfernt, erscheint automatisch das Standard-Pinsel-Logo.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 items-center bg-steiermark-50 p-4 rounded-xl border border-steiermark-200">
+                        <label class="w-full sm:w-auto bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-5 py-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer shrink-0">
+                            <i class="fa-solid fa-file-arrow-up"></i>
+                            <span>Textdatei (.txt) auswählen</span>
+                            <input type="file" class="hidden" accept=".txt" onchange="handleSloganTxtUpload(event)">
+                        </label>
+                        <div class="flex-grow flex items-center justify-between w-full">
+                            <div class="text-[11px] text-steiermark-600 font-semibold" id="admin-slogan-status">
+                                Kein benutzerdefinierter Slogan (Standard-Bild aktiv)
+                            </div>
+                            <button id="reset-slogan-btn" onclick="resetSloganText()" class="hidden bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-black transition-all">
+                                Löschen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INTEGRATED PHOTO GALLERY MANAGEMENT -->
+                <div class="bg-white rounded-2xl border border-steiermark-200 p-6 space-y-4 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-steiermark-100 text-steiermark-50 p-2 rounded-lg text-sm"><i class="fa-solid fa-images"></i></span>
+                            <h4 class="font-black text-base text-steiermark-900">Fotogalerie verwalten</h4>
+                        </div>
+                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">Live Galerie-Grid</span>
+                    </div>
+                    
+                    <div class="bg-steiermark-50 p-4 rounded-xl border border-steiermark-200 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <p class="text-xs text-steiermark-600 font-bold">Fügen Sie neue Impressionen für das Bergbad oder das Wirtshaus hinzu:</p>
+                            <label class="bg-emerald-600 hover:bg-emerald-800 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-sm">
+                                <i class="fa-solid fa-plus"></i> Neues Foto hinzufügen
+                                <input type="file" class="hidden" accept="image/*" onchange="addGalleryImage(event)">
+                            </label>
+                        </div>
+
+                        <div id="admin-gallery-list" class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- FILE SIMULATOR GRID (Strictly 1:1 mapped to visitor section labels) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
-                    <!-- UPLOAD MODULE 1: SPEISEKARTE (Only Speisekarte remains, no tagesmenü / specials) -->
+                    <!-- UPLOAD SPEISEKARTE (Restauration) -->
                     <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
                         <div class="flex justify-between items-start">
                             <div class="flex items-center gap-2">
                                 <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-utensils"></i></span>
-                                <h4 class="font-extrabold text-sm text-steiermark-900">Speisekarte</h4>
+                                <h4 class="font-extrabold text-sm text-steiermark-900">Unsere Speisekarte</h4>
                             </div>
-                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">speisekarte.pdf</span>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">documents/speisekarte.pdf</span>
                         </div>
                         
                         <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
-                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-speisekarte-filename" class="font-bold text-steiermark-800">speisekarte.pdf</span></div>
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-speisekarte-filename" class="font-bold text-steiermark-800">documents/speisekarte.pdf</span></div>
                             
-                            <!-- Premium Uploader -->
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-folder-open text-steiermark-500"></i>
                                 <span>Datei auswählen</span>
@@ -565,20 +671,19 @@
                         </div>
                     </div>
 
-                    <!-- UPLOAD MODULE 2: EINTRITTSPREISE -->
+                    <!-- UPLOAD EINTRITTSPREISE (Angebot) -->
                     <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
                         <div class="flex justify-between items-start">
                             <div class="flex items-center gap-2">
                                 <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-file-pdf"></i></span>
                                 <h4 class="font-extrabold text-sm text-steiermark-900">Eintrittspreise</h4>
                             </div>
-                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">tarife.pdf</span>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">documents/tarife.pdf</span>
                         </div>
                         
                         <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
-                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-eintrittspreise-filename" class="font-bold text-steiermark-800">tarife.pdf</span></div>
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-eintrittspreise-filename" class="font-bold text-steiermark-800">documents/tarife.pdf</span></div>
                             
-                            <!-- Premium Uploader -->
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-folder-open text-steiermark-500"></i>
                                 <span>Datei auswählen</span>
@@ -587,20 +692,19 @@
                         </div>
                     </div>
 
-                    <!-- UPLOAD MODULE 3: GÄSTE UND FREIZEITINFRASTRUKTUR -->
+                    <!-- UPLOAD GÄSTE UND FREIZEITINFRASTRUKTUR (Angebot) -->
                     <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
                         <div class="flex justify-between items-start">
                             <div class="flex items-center gap-2">
                                 <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-circle-info"></i></span>
                                 <h4 class="font-extrabold text-sm text-steiermark-900">Gäste und Freizeitinfrastruktur</h4>
                             </div>
-                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">sport_und_erholung.pdf</span>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">documents/sport_und_erholung.pdf</span>
                         </div>
                         
                         <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
-                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-angebote-filename" class="font-bold text-steiermark-800">sport_und_erholung.pdf</span></div>
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-angebote-filename" class="font-bold text-steiermark-800">documents/sport_und_erholung.pdf</span></div>
                             
-                            <!-- Premium Uploader -->
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-folder-open text-steiermark-500"></i>
                                 <span>Datei auswählen</span>
@@ -609,20 +713,19 @@
                         </div>
                     </div>
 
-                    <!-- UPLOAD MODULE 4: SCHWIMMKURSE FÜR KINDER UND ERWACHSENE -->
+                    <!-- UPLOAD SCHWIMMKURSE FÜR KINDER UND ERWACHSENE (Angebot) -->
                     <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
                         <div class="flex justify-between items-start">
                             <div class="flex items-center gap-2">
-                                <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-person-swimming"></i></span>
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase">KURSANGEBOTE</span>
                                 <h4 class="font-extrabold text-sm text-steiermark-900">Schwimmkurse für Kinder und Erwachsene</h4>
                             </div>
-                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">kursangebote.pdf</span>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">documents/kursangebote.pdf</span>
                         </div>
                         
                         <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
-                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-kursangebote-filename" class="font-bold text-steiermark-800">kursangebote.pdf</span></div>
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-kursangebote-filename" class="font-bold text-steiermark-800">documents/kursangebote.pdf</span></div>
                             
-                            <!-- Premium Uploader -->
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-folder-open text-steiermark-500"></i>
                                 <span>Datei auswählen</span>
@@ -631,20 +734,19 @@
                         </div>
                     </div>
 
-                    <!-- UPLOAD MODULE 5: POOLPARTYS -->
+                    <!-- UPLOAD POOLPARTYS (Veranstaltungen & Aktivitäten) -->
                     <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
                         <div class="flex justify-between items-start">
                             <div class="flex items-center gap-2">
-                                <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-music"></i></span>
+                                <span class="bg-steiermark-100 text-steiermark-50 p-2 rounded-lg text-sm"><i class="fa-solid fa-music"></i></span>
                                 <h4 class="font-extrabold text-sm text-steiermark-900">Poolpartys</h4>
                             </div>
-                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">poolparty.png</span>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">images/poolparty.png</span>
                         </div>
                         
                         <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
-                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-poolparty-filename" class="font-bold text-steiermark-800">poolparty.png</span></div>
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-poolparty-filename" class="font-bold text-steiermark-800">images/poolparty.png</span></div>
                             
-                            <!-- Premium Uploader -->
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-folder-open text-steiermark-500"></i>
                                 <span>Datei auswählen</span>
@@ -653,18 +755,18 @@
                         </div>
                     </div>
 
-                    <!-- UPLOAD MODULE 6: EVENTS -->
+                    <!-- UPLOAD EVENTS (Veranstaltungen & Aktivitäten) -->
                     <div class="bg-white rounded-xl border border-steiermark-200 p-5 space-y-4 shadow-sm">
                         <div class="flex justify-between items-start">
                             <div class="flex items-center gap-2">
-                                <span class="bg-steiermark-100 text-steiermark-500 p-2 rounded-lg text-sm"><i class="fa-solid fa-calendar-days"></i></span>
+                                <span class="bg-steiermark-100 text-steiermark-50 p-2 rounded-lg text-sm"><i class="fa-solid fa-calendar-days"></i></span>
                                 <h4 class="font-extrabold text-sm text-steiermark-900">Events</h4>
                             </div>
-                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">events.pdf</span>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">documents/events.pdf</span>
                         </div>
                         
                         <div class="border border-dashed border-steiermark-200 rounded-lg p-4 bg-steiermark-50 text-center space-y-3">
-                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-events-filename" class="font-bold text-steiermark-800">events.pdf</span></div>
+                            <div class="text-xs text-steiermark-500 font-semibold">Aktuell aktiv: <span id="admin-events-filename" class="font-bold text-steiermark-800">documents/events.pdf</span></div>
                             
                             <!-- Premium Uploader -->
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
@@ -677,7 +779,7 @@
 
                 </div>
 
-                <!-- Simulation Info Toast -->
+                <!-- Simulations-Info-Toast -->
                 <div id="sim-toast" class="hidden mt-6 bg-emerald-600 text-white font-bold p-4 rounded-xl shadow-lg flex items-center justify-between transition-all">
                     <span id="sim-toast-message">Datei erfolgreich hochgeladen und verarbeitet!</span>
                     <button onclick="hideToast()" class="text-white hover:text-emerald-200"><i class="fa-solid fa-xmark"></i></button>
@@ -693,48 +795,64 @@
         // State variables
         let currentView = 'user';
         let currentLanguage = 'de';
+        let isAdminAuthenticated = false;
+
+        // Fotogalerie Standard-Bilder (Pfadangepasst, greift auf Unsplash-Backup zurück wenn leer)
+        let galleryImages = [
+            { id: 1, url: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=600&q=80', title: 'Bergbad Panoramabecken' },
+            { id: 2, url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80', title: 'Steirisches Hügelland' },
+            { id: 3, url: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=600&q=80', title: 'Sommer Poolparty' },
+            { id: 4, url: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80', title: 'Liegestuhl Ausblick' }
+        ];
         
-        // Simulative Database of Files - Completely Synchronized
+        // Simulations-Datenbank mit den korrekten relativen Serverpfaden (Defaults sind null, damit lokale Dateien geladen werden)
         const database = {
-            hero: {
-                filename: 'bergbad_retznei.png',
+            hero_desktop: {
+                filename: 'images/bergbad_retznei_desktop.png',
                 dataUrl: null
             },
+            hero_mobile: {
+                filename: 'images/bergbad_retznei_mobile.png',
+                dataUrl: null
+            },
+            custom_slogan: {
+                text: "",
+                filename: ""
+            },
             speisekarte: {
-                filename: 'speisekarte.pdf',
+                filename: 'documents/speisekarte.pdf',
                 isImage: false,
                 dataUrl: null
             },
             tarife: {
-                filename: 'tarife.pdf',
+                filename: 'documents/tarife.pdf',
                 isImage: false,
                 dataUrl: null
             },
             sport_und_erholung: {
-                filename: 'sport_und_erholung.pdf',
+                filename: 'documents/sport_und_erholung.pdf',
                 isImage: false,
                 dataUrl: null
             },
             kursangebote: {
-                filename: 'kursangebote.pdf',
+                filename: 'documents/kursangebote.pdf',
                 isImage: false,
                 dataUrl: null
             },
             poolparty: {
-                filename: 'poolparty.png',
+                filename: 'images/poolparty.png',
                 isImage: true,
                 dataUrl: null
             },
             events: {
-                filename: 'events.pdf',
+                filename: 'documents/events.pdf',
                 isImage: false,
                 dataUrl: null
             }
         };
 
-        // Real Local File Reader with dynamic canvas background transparency stripper
+        // Automatischer Hintergrund-Entferner für Slogan
         function removeWhiteBackground(imgElement) {
-            // Check if already processed to avoid infinite loop
             if (imgElement.dataset.processed === 'true') return;
             
             const canvas = document.createElement('canvas');
@@ -752,12 +870,8 @@
                 try {
                     const imgData = ctx.getImageData(0, 0, w, h);
                     const data = imgData.data;
-                    
-                    // Visited array for BFS flood fill
                     const visited = new Uint8Array(w * h);
                     const queue = [];
-                    
-                    // Threshold for detecting near-white pixels (e.g. 230 to 255)
                     const threshold = 230; 
                     
                     const checkAndPush = (x, y) => {
@@ -770,7 +884,6 @@
                         const g = data[p+1];
                         const b = data[p+2];
                         
-                        // If it's near white, mark as background and make fully transparent
                         if (r > threshold && g > threshold && b > threshold) {
                             visited[idx] = 1;
                             data[p+3] = 0; // Set Alpha channel to 0 (completely transparent)
@@ -778,7 +891,6 @@
                         }
                     };
                     
-                    // Start flood-fill from all 4 borders of the image
                     for (let x = 0; x < w; x++) {
                         checkAndPush(x, 0);
                         checkAndPush(x, h - 1);
@@ -788,7 +900,6 @@
                         checkAndPush(w - 1, y);
                     }
                     
-                    // BFS Flood Fill Execution
                     let head = 0;
                     while (head < queue.length) {
                         const idx = queue[head++];
@@ -801,19 +912,12 @@
                         checkAndPush(x, y - 1);
                     }
                     
-                    // Put processed pixels back to canvas
                     ctx.putImageData(imgData, 0, 0);
-                    
-                    // Mark as processed to prevent infinite load loop
                     imgElement.dataset.processed = 'true';
-                    
-                    // Update image src to the transparent data URL
                     imgElement.src = canvas.toDataURL();
-                    
-                    // Remove mixing styles so the image stays bright and colored!
                     imgElement.classList.remove('mix-blend-multiply');
                 } catch (e) {
-                    console.warn("CORS limitation prevented client-side pixel stripping. Falling back to mix-blend-multiply.", e);
+                    console.warn("CORS blockiert Pixel-Manipulation, fallback aktiv.", e);
                     imgElement.classList.add('mix-blend-multiply');
                 }
             };
@@ -825,7 +929,166 @@
             }
         }
 
-        // Real Local File Reader for Prototyping
+        // Automatisches Laden der Slogan-Datei vom Live-Webserver beim Starten
+        function loadServerSlogan() {
+            fetch('documents/SLOGAN_TEXT.txt')
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error('Slogan-Datei nicht vorhanden.');
+                })
+                .then(text => {
+                    if (text && text.trim().length > 0) {
+                        database.custom_slogan.text = text.trim();
+                        database.custom_slogan.filename = 'documents/SLOGAN_TEXT.txt';
+                        updateDynamicTexts();
+                        console.log("Slogan vom Server erfolgreich geladen: ", text.trim());
+                    }
+                })
+                .catch(err => {
+                    console.log("Kein Server-Slogan-Text geladen (Bild-Fallback aktiv). Info:", err.message);
+                });
+        }
+
+        // TXT-Slogan im Admin-Dashboard manuell hochladen
+        function handleSloganTxtUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.name.endsWith('.txt')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    database.custom_slogan.text = e.target.result.trim();
+                    database.custom_slogan.filename = 'documents/' + file.name;
+                    updateDynamicTexts();
+                    showToast("Slogan erfolgreich aus '" + file.name + "' geladen!");
+                };
+                reader.readAsText(file);
+            } else {
+                showToast("Bitte laden Sie nur eine gültige .txt-Datei für den Slogan hoch!");
+            }
+        }
+
+        function resetSloganText() {
+            database.custom_slogan.text = "";
+            database.custom_slogan.filename = "";
+            updateDynamicTexts();
+            showToast("Slogan zurückgesetzt. Pinsellogo wieder aktiv.");
+        }
+
+        // Hero-Bild nach Gerät ausrichten
+        function handleDeviceOrientationCheck() {
+            const isMobile = window.innerWidth < 768;
+            const heroImg = document.getElementById('hero-bg-img');
+            if (heroImg) {
+                if (isMobile) {
+                    heroImg.src = database.hero_mobile.dataUrl || database.hero_mobile.filename;
+                } else {
+                    heroImg.src = database.hero_desktop.dataUrl || database.hero_desktop.filename;
+                }
+            }
+        }
+        window.addEventListener('resize', handleDeviceOrientationCheck);
+
+        // Upload desktop / mobile hero images im Dashboard
+        function handleDeviceHeroUpload(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (type === 'desktop') {
+                    database.hero_desktop.filename = 'images/' + file.name;
+                    database.hero_desktop.dataUrl = e.target.result;
+                    document.getElementById('admin-hero-desktop-filename').innerText = database.hero_desktop.filename;
+                } else {
+                    database.hero_mobile.filename = 'images/' + file.name;
+                    database.hero_mobile.dataUrl = e.target.result;
+                    document.getElementById('admin-hero-mobile-filename').innerText = database.hero_mobile.filename;
+                }
+                handleDeviceOrientationCheck();
+                showToast("Hero-Bild (" + type + ") live aktualisiert!");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Fotos zur Galerie hinzufügen
+        function addGalleryImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const newImg = {
+                    id: Date.now(),
+                    url: e.target.result,
+                    title: file.name.substring(0, file.name.lastIndexOf('.')) || 'Bild'
+                };
+                galleryImages.push(newImg);
+                updateGalleryUI();
+                showToast("Foto '" + file.name + "' erfolgreich zur Galerie hinzugefügt!");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Fotos aus Galerie entfernen
+        function deleteGalleryImage(id) {
+            galleryImages = galleryImages.filter(img => img.id !== id);
+            updateGalleryUI();
+            showToast("Foto erfolgreich aus der Galerie gelöscht.");
+        }
+
+        // Render Galerie
+        function updateGalleryUI() {
+            const grid = document.getElementById('gallery-grid');
+            const adminList = document.getElementById('admin-gallery-list');
+            
+            if (grid) {
+                grid.innerHTML = galleryImages.map(img => `
+                    <div class="relative overflow-hidden rounded-xl h-48 sm:h-64 shadow-md group cursor-pointer" onclick="openLightbox('${img.url}')">
+                        <img src="${img.url}" alt="${img.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                            <p class="text-white text-xs font-bold font-sans tracking-wide uppercase">${img.title}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            if (adminList) {
+                adminList.innerHTML = galleryImages.map(img => `
+                    <div class="relative bg-white border border-steiermark-200 rounded-lg p-2 flex flex-col space-y-2">
+                        <div class="h-24 rounded overflow-hidden">
+                            <img src="${img.url}" alt="" class="w-full h-full object-cover" />
+                        </div>
+                        <p class="text-[10px] text-steiermark-800 font-extrabold truncate">${img.title}</p>
+                        <button onclick="deleteGalleryImage(${img.id})" class="bg-red-500 hover:bg-red-700 text-white font-extrabold text-[10px] py-1 rounded transition-all flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-trash-can"></i> Löschen
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Lightbox-Vorschau
+        function openLightbox(url) {
+            const modal = document.getElementById('lightbox-modal');
+            const img = document.getElementById('lightbox-img');
+            if (modal && img) {
+                img.src = url;
+                modal.classList.remove('hidden');
+            }
+        }
+
+        // Schließen der Lightbox
+        function closeLightbox() {
+            const modal = document.getElementById('lightbox-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Lokaler Prototypen-Uploader
         function handleLocalImageUpload(event, category) {
             const file = event.target.files[0];
             if (!file) return;
@@ -833,55 +1096,82 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const dataUrl = e.target.result;
+                const folder = (file.type.startsWith('image/')) ? 'images/' : 'documents/';
+                database[category].filename = folder + file.name;
+                database[category].dataUrl = dataUrl;
                 
-                if (category === 'hero') {
-                    // Update Hero Background instantly
-                    document.getElementById('hero-bg-img').src = dataUrl;
-                    document.getElementById('hero-upload-filename-status').innerHTML = `
-                        <span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> Live geladen: ${file.name}</span>
-                    `;
-                    showToast("Das Schwimmbad-Hintergrundbild wurde erfolgreich durch dein Bild " + file.name + " ersetzt!");
+                if (file.type.startsWith('image/')) {
+                    database[category].isImage = true;
                 } else {
-                    // Update specific category
-                    database[category].filename = file.name;
-                    database[category].dataUrl = dataUrl;
-                    
-                    if (file.type.startsWith('image/')) {
-                        database[category].isImage = true;
-                    } else {
-                        database[category].isImage = false;
-                    }
-                    
-                    updateDynamicTexts();
-                    showToast('"' + file.name + '" wurde geladen und wird jetzt live in der Besucher-Ansicht angezeigt!');
+                    database[category].isImage = false;
                 }
+                
+                updateDynamicTexts();
+                showToast('"' + file.name + '" wurde geladen und wird jetzt live in der Besucher-Ansicht angezeigt!');
             };
             reader.readAsDataURL(file);
         }
 
-        // Toggle View: User vs Admin
+        // Sichtensteuerung
         function setView(view) {
             currentView = view;
             
             const btnUser = document.getElementById('btn-user-view');
-            const btnAdmin = document.getElementById('btn-admin-view');
             const containerUser = document.getElementById('user-view-container');
             const containerAdmin = document.getElementById('admin-view-container');
 
             if (view === 'user') {
                 btnUser.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all bg-steiermark-500 text-white flex items-center gap-1.5";
-                btnAdmin.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all text-steiermark-300 hover:text-white flex items-center gap-1.5";
                 containerUser.classList.remove('hidden');
                 containerAdmin.classList.add('hidden');
             } else {
-                btnAdmin.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all bg-steiermark-500 text-white flex items-center gap-1.5";
                 btnUser.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all text-steiermark-300 hover:text-white flex items-center gap-1.5";
                 containerUser.classList.add('hidden');
                 containerAdmin.classList.remove('hidden');
             }
         }
 
-        // Language Switcher DE / SL
+        // Passwortschutz Authentifizierung
+        function triggerAdminAuth() {
+            if (isAdminAuthenticated) {
+                setView('admin');
+            } else {
+                document.getElementById('admin-auth-modal').classList.remove('hidden');
+                document.getElementById('admin-password-input').focus();
+            }
+        }
+
+        function cancelAdminAuth() {
+            document.getElementById('admin-auth-modal').classList.add('hidden');
+            document.getElementById('auth-error-msg').classList.add('hidden');
+            document.getElementById('admin-password-input').value = "";
+        }
+
+        function submitAdminAuth() {
+            const pwInput = document.getElementById('admin-password-input').value;
+            if (pwInput === 'retznei2026') {
+                isAdminAuthenticated = true;
+                document.getElementById('admin-auth-modal').classList.add('hidden');
+                document.getElementById('auth-error-msg').classList.add('hidden');
+                document.getElementById('admin-password-input').value = "";
+                setView('admin');
+                showToast("Erfolgreich als Doroteja Korošec angemeldet!");
+            } else {
+                const error = document.getElementById('auth-error-msg');
+                error.classList.remove('hidden');
+                const modal = document.querySelector('#admin-auth-modal > div');
+                modal.classList.add('animate-bounce');
+                setTimeout(() => modal.classList.remove('animate-bounce'), 500);
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminAuthenticated = false;
+            setView('user');
+            showToast("Sicher abgemeldet.");
+        }
+
+        // Sprachen-Umschalter
         function setLanguage(lang) {
             currentLanguage = lang;
             
@@ -896,7 +1186,7 @@
                 btnDe.className = "px-2.5 py-1 rounded text-steiermark-500 hover:text-steiermark-900 transition-all";
             }
 
-            // Translate DOM Elements
+            // Übersetzungen spiegeln
             const translatable = document.querySelectorAll('[data-de]');
             translatable.forEach(el => {
                 if (lang === 'de') {
@@ -906,25 +1196,21 @@
                 }
             });
 
-            // Update Dynamic Texts Based on Simulative Database
             updateDynamicTexts();
         }
 
-        // Mobile Hamburger Menu Toggle
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
             if (menu) menu.classList.toggle('hidden');
         }
 
-        // Update Text Segments that can change dynamically from simulated upload
+        // Synchronisation Frontend <-> Backend
         function updateDynamicTexts() {
-            // Safe helper to check existence before setting
             const setText = (id, val) => {
                 const el = document.getElementById(id);
                 if (el) el.innerText = val;
             };
 
-            // Update Filenames in User view
             setText('user-speisekarte-filename', database.speisekarte.filename);
             setText('user-poolparty-filename', database.poolparty.filename);
             setText('user-events-filename', database.events.filename);
@@ -932,7 +1218,6 @@
             setText('user-angebote-filename', database.sport_und_erholung.filename);
             setText('user-kursangebote-filename', database.kursangebote.filename);
 
-            // Admin Panel Filenames
             setText('admin-speisekarte-filename', database.speisekarte.filename);
             setText('admin-poolparty-filename', database.poolparty.filename);
             setText('admin-events-filename', database.events.filename);
@@ -940,33 +1225,26 @@
             setText('admin-angebote-filename', database.sport_und_erholung.filename);
             setText('admin-kursangebote-filename', database.kursangebote.filename);
 
-            // Render Speisekarte / PDF / Image Block if uploaded
-            const speisekarteImageContainer = document.getElementById('speisekarte-image-preview-container');
-            const speisekarteMediaPreview = document.getElementById('speisekarte-media-preview');
-            
-            if (speisekarteImageContainer && speisekarteMediaPreview) {
-                if (database.speisekarte.dataUrl) {
-                    speisekarteImageContainer.classList.remove('hidden');
-                    if (database.speisekarte.isImage) {
-                        speisekarteMediaPreview.innerHTML = '<img src="' + database.speisekarte.dataUrl + '" alt="Hochgeladene Speisekarte" class="w-full h-auto rounded-lg shadow-sm max-h-[500px] object-contain" />';
-                    } else {
-                        // Full PDF Display in visitor view! Wrapped inside responsive panning container for iOS compatibility
-                        speisekarteMediaPreview.innerHTML = `
-                            <div class="border border-steiermark-200 rounded-xl bg-white p-2 sm:p-4 text-center space-y-4">
-                                <div class="w-full overflow-x-auto rounded-lg border border-steiermark-200" style="-webkit-overflow-scrolling: touch;">
-                                    <iframe src="${database.speisekarte.dataUrl}" class="w-full h-[450px] min-w-[500px] sm:min-w-0" style="border: none;"></iframe>
-                                </div>
-                            </div>`;
-                    }
-                } else {
-                    speisekarteImageContainer.classList.add('hidden');
-                }
+            const sloganContainer = document.getElementById('slogan-container');
+            const fallbackSlogan = document.getElementById('fallback-slogan-text');
+            const targetSloganText = document.getElementById('custom-slogan-text-target');
+            const resetBtn = document.getElementById('reset-slogan-btn');
+            const sloganStatus = document.getElementById('admin-slogan-status');
+
+            if (database.custom_slogan.text !== "") {
+                if (sloganContainer) sloganContainer.classList.add('hidden');
+                if (fallbackSlogan) fallbackSlogan.classList.remove('hidden');
+                if (targetSloganText) targetSloganText.innerText = database.custom_slogan.text;
+                if (resetBtn) resetBtn.classList.remove('hidden');
+                if (sloganStatus) sloganStatus.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> Aktiv: "' + database.custom_slogan.filename + '"</span>';
+            } else {
+                if (sloganContainer) sloganContainer.classList.remove('hidden');
+                if (fallbackSlogan) fallbackSlogan.classList.add('hidden');
+                if (resetBtn) resetBtn.classList.add('hidden');
+                if (sloganStatus) sloganStatus.innerText = "Kein benutzerdefinierter Slogan (Standard-Bild aktiv)";
             }
 
-            // Render Poolparty/Event Section (Featuring Uploaded Images / PDFs)
-            const eventData = database.poolparty[currentLanguage];
             const poolpartyPreviewTarget = document.getElementById('poolparty-preview-target');
-            
             if (poolpartyPreviewTarget) {
                 if (database.poolparty.dataUrl) {
                     if (database.poolparty.isImage) {
@@ -975,11 +1253,10 @@
                         poolpartyPreviewTarget.innerHTML = '<div class="bg-steiermark-800 text-white p-4 text-center space-y-2 h-24 flex flex-col justify-center items-center"><div class="text-accent-gold text-2xl"><i class="fa-solid fa-file-pdf"></i></div><p class="text-[10px] text-steiermark-300 truncate max-w-[150px] font-semibold">' + database.poolparty.filename + '</p></div>';
                     }
                 } else {
-                    poolpartyPreviewTarget.innerHTML = '<img id="poolparty-img" src="poolparty.png" alt="Poolparty Bergbad Retznei" class="w-full h-48 sm:h-72 object-cover object-center group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src=\'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80\';" />';
+                    poolpartyPreviewTarget.innerHTML = '<img id="poolparty-img" src="images/poolparty.png" alt="Poolparty Bergbad Retznei" class="w-full h-48 sm:h-72 object-cover object-center group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src=\'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80\';" />';
                 }
             }
 
-            // Render Events Preview If PDF is uploaded
             const eventsPreviewTarget = document.getElementById('events-preview-target');
             const eventsPdfIframe = document.getElementById('events-pdf-iframe');
             if (eventsPreviewTarget && eventsPdfIframe) {
@@ -992,65 +1269,7 @@
             }
         }
 
-        // Upload Simulator
-        function simulateUpload(category, type) {
-            // Reset custom dataUrls when simulating defaults
-            database[category].dataUrl = null;
-            database[category].isImage = (category === 'poolparty');
-
-            // Update Database File & Texts dynamically based on action
-            if (category === 'speisekarte') {
-                if (type === 'sommer') {
-                    database.speisekarte.filename = 'schmankerl_karte_sommer_2026.pdf';
-                } else {
-                    database.speisekarte.filename = 'herbstschmankerl_weinstraesse_2026.pdf';
-                }
-            } else if (category === 'poolparty') {
-                if (type === 'sunset') {
-                    database.poolparty.filename = 'poolparty.png';
-                } else if (type === 'kiste') {
-                    database.poolparty.filename = 'kistenfleisch_wirtshaus_juni.jpg';
-                }
-            } else if (category === 'tarife') {
-                if (type === '2026') {
-                    database.tarife.filename = 'badetarife_offiziell_2026.pdf';
-                } else {
-                    database.tarife.filename = 'entwurf_preise_saison_2027.pdf';
-                }
-            } else if (category === 'sport_und_erholung') {
-                if (type === 'swim') {
-                    database.sport_und_erholung.filename = 'swim_clinic_kurse_sommer_2026.pdf';
-                } else {
-                    database.sport_und_erholung.filename = 'volleyball_freizeitangebot_bergbad.pdf';
-                }
-            }
-
-            // Sync texts & filenames instantly
-            updateDynamicTexts();
-
-            // Display Success Toast
-            showToast("Datei wurde erfolgreich in der Kategorie " + category.toUpperCase() + " ausgetauscht! Name der neuen PDF: " + database[category].filename);
-        }
-
-        // Show toast
-        function showToast(message) {
-            const toast = document.getElementById('sim-toast');
-            const toastMsg = document.getElementById('sim-toast-message');
-            toastMsg.innerText = message;
-            toast.classList.remove('hidden');
-            
-            // Auto hide after 6 seconds
-            setTimeout(() => {
-                hideToast();
-            }, 6000);
-        }
-
-        // Hide toast
-        function hideToast() {
-            document.getElementById('sim-toast').classList.add('hidden');
-        }
-
-        // Mock PDF Download / Open Real Uploaded File Dialog
+        // PDF & Vorschau Handler (Robust, öffnet auf dem Server direkt die echte Datei)
         function simulatePdfDownload(areaName) {
             const keyMap = {
                 'Speisenkarte': 'speisekarte',
@@ -1062,50 +1281,19 @@
             };
             const dbKey = keyMap[areaName];
 
-            // If the user uploaded a real file (has a dataUrl), open it in a new window!
+            // 1. Wenn ein lokaler Upload im Admin-Dashboard stattgefunden hat (Vorschau aus Data-URL)
             if (database[dbKey] && database[dbKey].dataUrl) {
                 const newWindow = window.open();
                 if (newWindow) {
-                    // Full screen layout with viewport meta tag preventing scale compression on mobile browsers
-                    newWindow.document.write(`
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                            <meta charset="utf-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>Bergbad Retznei - \${database[dbKey].filename}</title>
-                            <style>
-                                html, body {
-                                    margin: 0;
-                                    padding: 0;
-                                    width: 100%;
-                                    height: 100%;
-                                    background: #0f2b1d;
-                                    overflow: hidden;
-                                    display: block;
-                                }
-                                iframe, img {
-                                    border: none;
-                                    width: 100%;
-                                    height: 100%;
-                                    display: block;
-                                }
-                                img {
-                                    object-fit: contain;
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            \${database[dbKey].isImage 
-                                ? \`<img src="\${database[dbKey].dataUrl}" alt="Vorschau" />\` 
-                                : \`<iframe src="\${database[dbKey].dataUrl}"></iframe>\`
-                            }
-                        </body>
-                        </html>
-                    `);
+                    newWindow.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Bergbad Retznei - Preview</title><style>html,body{margin:0;padding:0;width:100%;height:100%;background:#0f2b1d;display:flex;align-items:center;justify-content:center;}iframe,img{border:none;width:100%;height:100%;object-fit:contain;}</style></head><body>');
+                    if (database[dbKey].isImage) {
+                        newWindow.document.write('<img src="' + database[dbKey].dataUrl + '" alt="Vorschau" />');
+                    } else {
+                        newWindow.document.write('<iframe src="' + database[dbKey].dataUrl + '"></iframe>');
+                    }
+                    newWindow.document.write('</body></html>');
                     newWindow.document.close();
                 } else {
-                    // Fail-safe direct download link if popup is blocked
                     const downloadLink = document.createElement('a');
                     downloadLink.href = database[dbKey].dataUrl;
                     downloadLink.download = database[dbKey].filename;
@@ -1115,9 +1303,18 @@
                 return;
             }
 
-            // Fallback for simulation template files
+            // 2. Standard Server-Betrieb: Öffnet direkt die PDF im documents- oder images-Ordner
+            if (database[dbKey] && database[dbKey].filename) {
+                window.open(database[dbKey].filename, '_blank');
+                return;
+            }
+
+            // Fallback Modal (Sicherheitsnetz)
             const customModal = document.createElement('div');
             customModal.className = "fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all";
+            
+            const targetFilename = database[dbKey] ? database[dbKey].filename : 'datei.pdf';
+            
             customModal.innerHTML = `
                 <div class="bg-white border border-steiermark-200 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 text-steiermark-900">
                     <div class="flex items-center gap-3 text-accent-gold">
@@ -1125,11 +1322,11 @@
                         <h4 class="text-lg font-black">Simulation: Download läuft</h4>
                     </div>
                     <p class="text-xs text-steiermark-700 leading-relaxed font-medium">
-                        Hier öffnet sich in der realen Webseite das vom Pächter hochgeladene PDF-Dokument oder Bild für die Kategorie <strong>\${areaName}</strong>. 
+                        Hier öffnet sich in der realen Webseite das vom Pächter hochgeladene PDF-Dokument oder Bild für die Sektion <strong>` + areaName + `</strong>. 
                         Es ist mobil-optimiert und kann direkt am Smartphone des Gastes gespeichert oder ausgedruckt werden.
                     </p>
                     <div class="bg-steiermark-100 rounded-xl p-4 text-xs font-mono text-steiermark-800 border border-steiermark-200">
-                        Zieldatei: \${database[dbKey] ? database[dbKey].filename : 'datei.pdf'}
+                        Zieldatei: ` + targetFilename + `
                     </div>
                     <div class="flex justify-end pt-2">
                         <button id="close-modal-btn" class="bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg transition-all shadow">
@@ -1145,10 +1342,38 @@
             });
         }
 
-        // Set initial view on load
+        // Steuerung der UI Toasts
+        function showToast(message) {
+            const toast = document.getElementById('sim-toast');
+            const msg = document.getElementById('sim-toast-message');
+            if (toast && msg) {
+                msg.innerText = message;
+                toast.classList.remove('hidden');
+                setTimeout(hideToast, 5000);
+            }
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('sim-toast');
+            if (toast) toast.classList.add('hidden');
+        }
+
+        // Überprüfung und Initialisierung beim Seitenstart
         window.onload = function() {
+            // Zeige die Admin-Leiste wenn der URL-Parameter ?admin vorhanden ist
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('admin')) {
+                const adminBar = document.getElementById('top-simulation-bar');
+                if (adminBar) adminBar.classList.remove('hidden');
+            }
+            
             setView('user');
             setLanguage('de');
+            handleDeviceOrientationCheck();
+            updateGalleryUI();
+            
+            // Slogan automatisch vom Server laden
+            loadServerSlogan();
         };
     </script>
 </body>
