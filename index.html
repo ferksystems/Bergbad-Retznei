@@ -579,7 +579,7 @@
                             <label class="w-full bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-cloud-arrow-up"></i>
                                 <span>Desktop-Bild hochladen</span>
-                                <input type="file" class="hidden" accept="image/*" onchange="handleDeviceHeroUpload(event, 'desktop')">
+                                <input type="file" class="hidden" accept=".png,.jpg,.jpeg" onchange="uploadManagedFile(event, 'hero_desktop')">
                             </label>
                             <p class="text-[10px] text-steiermark-600 truncate font-semibold" id="admin-hero-desktop-filename">images/bergbad_retznei_desktop.png (Standard)</p>
                         </div>
@@ -588,7 +588,7 @@
                             <label class="w-full bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-cloud-arrow-up"></i>
                                 <span>Mobil-Bild hochladen</span>
-                                <input type="file" class="hidden" accept="image/*" onchange="handleDeviceHeroUpload(event, 'mobile')">
+                                <input type="file" class="hidden" accept=".png,.jpg,.jpeg" onchange="uploadManagedFile(event, 'hero_mobile')">
                             </label>
                             <p class="text-[10px] text-steiermark-600 truncate font-semibold" id="admin-hero-mobile-filename">images/bergbad_retznei_mobile.png (Standard)</p>
                         </div>
@@ -602,7 +602,7 @@
                             <span class="bg-steiermark-100 text-steiermark-50 p-2 rounded-lg text-sm"><i class="fa-solid fa-pen-nib"></i></span>
                             <h4 class="font-black text-base text-steiermark-900">Slogan-Textdatei hochladen</h4>
                         </div>
-                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">documents/SLOGAN_TEXT.txt</span>
+                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-black uppercase">documents/slogan_text.txt</span>
                     </div>
                     <p class="text-xs text-steiermark-600 leading-relaxed font-semibold">
                         Laden Sie eine einfache Textdatei hoch, um einen tagesaktuellen Slogan über dem Pool zu platzieren (z.B. „Heute Grillabend am Rosenberg!“). Wird die Datei entfernt, erscheint automatisch das Standard-Pinsel-Logo.
@@ -611,7 +611,7 @@
                         <label class="w-full sm:w-auto bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-5 py-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer shrink-0">
                             <i class="fa-solid fa-file-arrow-up"></i>
                             <span>Textdatei (.txt) auswählen</span>
-                            <input type="file" class="hidden" accept=".txt" onchange="handleSloganTxtUpload(event)">
+                            <input type="file" class="hidden" accept=".txt" onchange="uploadManagedFile(event, 'slogan')">
                         </label>
                         <div class="flex-grow flex items-center justify-between w-full">
                             <div class="text-[11px] text-steiermark-600 font-semibold" id="admin-slogan-status">
@@ -639,7 +639,7 @@
                             <p class="text-xs text-steiermark-600 font-bold">Fügen Sie neue Impressionen für das Bergbad oder das Wirtshaus hinzu:</p>
                             <label class="bg-emerald-600 hover:bg-emerald-800 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-plus"></i> Neues Foto hinzufügen
-                                <input type="file" class="hidden" accept="image/*" onchange="addGalleryImage(event)">
+                                <input type="file" class="hidden" accept=".png,.jpg,.jpeg" onchange="uploadManagedFile(event, 'gallery')" multiple>
                             </label>
                         </div>
 
@@ -666,7 +666,7 @@
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-folder-open text-steiermark-500"></i>
                                 <span>Datei auswählen</span>
-                                <input type="file" class="hidden" accept="image/*,application/pdf" onchange="handleLocalImageUpload(event, 'speisekarte')">
+                                <input type="file" class="hidden" accept=".pdf" onchange="uploadManagedFile(event, 'speisekarte')">
                             </label>
                         </div>
                     </div>
@@ -687,7 +687,7 @@
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-folder-open text-steiermark-500"></i>
                                 <span>Datei auswählen</span>
-                                <input type="file" class="hidden" accept="image/*,application/pdf" onchange="handleLocalImageUpload(event, 'tarife')">
+                                <input type="file" class="hidden" accept=".pdf" onchange="uploadManagedFile(event, 'tarife')">
                             </label>
                         </div>
                     </div>
@@ -708,7 +708,7 @@
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-folder-open text-steiermark-500"></i>
                                 <span>Datei auswählen</span>
-                                <input type="file" class="hidden" accept="image/*,application/pdf" onchange="handleLocalImageUpload(event, 'sport_und_erholung')">
+                                <input type="file" class="hidden" accept=".pdf" onchange="uploadManagedFile(event, 'sport_und_erholung')">
                             </label>
                         </div>
                     </div>
@@ -729,7 +729,7 @@
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-folder-open text-steiermark-500"></i>
                                 <span>Datei auswählen</span>
-                                <input type="file" class="hidden" accept="image/*,application/pdf" onchange="handleLocalImageUpload(event, 'kursangebote')">
+                                <input type="file" class="hidden" accept=".pdf" onchange="uploadManagedFile(event, 'kursangebote')">
                             </label>
                         </div>
                     </div>
@@ -750,7 +750,7 @@
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-folder-open text-steiermark-500"></i>
                                 <span>Datei auswählen</span>
-                                <input type="file" class="hidden" accept="image/*" onchange="handleLocalImageUpload(event, 'poolparty')">
+                                <input type="file" class="hidden" accept=".png,.jpg,.jpeg" onchange="uploadManagedFile(event, 'poolparty')">
                             </label>
                         </div>
                     </div>
@@ -772,16 +772,16 @@
                             <label class="w-full bg-white hover:bg-steiermark-50 border border-steiermark-200 text-steiermark-800 font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-folder-open text-steiermark-500"></i>
                                 <span>Datei auswählen</span>
-                                <input type="file" class="hidden" accept="application/pdf" onchange="handleLocalImageUpload(event, 'events')">
+                                <input type="file" class="hidden" accept=".pdf" onchange="uploadManagedFile(event, 'events')">
                             </label>
                         </div>
                     </div>
 
                 </div>
 
-                <!-- Simulations-Info-Toast -->
+                <!-- Upload-Info-Toast -->
                 <div id="sim-toast" class="hidden mt-6 bg-emerald-600 text-white font-bold p-4 rounded-xl shadow-lg flex items-center justify-between transition-all">
-                    <span id="sim-toast-message">Datei erfolgreich hochgeladen und verarbeitet!</span>
+                    <span id="sim-toast-message">Datei erfolgreich hochgeladen und synchronisiert!</span>
                     <button onclick="hideToast()" class="text-white hover:text-emerald-200"><i class="fa-solid fa-xmark"></i></button>
                 </div>
 
@@ -850,6 +850,142 @@
                 dataUrl: null
             }
         };
+
+
+        // Server-side upload and live synchronization settings
+        // IMPORTANT: This value must match ADMIN_UPLOAD_TOKEN in /js/upload.php.
+        const UPLOAD_ENDPOINT = 'js/upload.php';
+        const ADMIN_UPLOAD_TOKEN = "RetzneiUpload_2026";
+
+        let siteContentVersion = Date.now();
+
+        function cacheBustPath(path) {
+            if (!path || path.startsWith('data:') || path.startsWith('http')) {
+                return path;
+            }
+
+            const separator = path.includes('?') ? '&' : '?';
+            return `${path}${separator}v=${siteContentVersion}`;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        /**
+         * Synchronization fix:
+         * The public page and the admin dashboard fetch the same manifest from the server.
+         * Admin uploads no longer live only as temporary FileReader data URLs in one browser.
+         */
+        async function fetchLiveContent() {
+            try {
+                const response = await fetch(`${UPLOAD_ENDPOINT}?action=manifest&t=${Date.now()}`, {
+                    method: 'GET',
+                    cache: 'no-store'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Manifest request failed: ${response.status}`);
+                }
+
+                const payload = await response.json();
+
+                if (!payload.success || !payload.manifest) {
+                    throw new Error(payload.message || 'Invalid manifest response.');
+                }
+
+                applyServerManifest(payload.manifest);
+            } catch (error) {
+                console.warn('Live content could not be loaded. Static fallback remains active.', error);
+            }
+        }
+
+        function applyServerManifest(manifest) {
+            siteContentVersion = manifest.version || Date.now();
+
+            const files = manifest.files || {};
+
+            Object.entries(files).forEach(([key, fileInfo]) => {
+                if (!database[key] || !fileInfo.path) {
+                    return;
+                }
+
+                database[key].filename = fileInfo.path;
+                database[key].dataUrl = null;
+                database[key].isImage = fileInfo.type === 'image';
+            });
+
+            if (typeof manifest.sloganText === 'string' && manifest.sloganText.trim() !== '') {
+                database.custom_slogan.text = manifest.sloganText.trim();
+                database.custom_slogan.filename = 'documents/slogan_text.txt';
+            } else {
+                database.custom_slogan.text = '';
+                database.custom_slogan.filename = '';
+            }
+
+            if (Array.isArray(manifest.gallery) && manifest.gallery.length > 0) {
+                galleryImages = manifest.gallery.map((item, index) => ({
+                    id: item.id || index + 1,
+                    url: item.path,
+                    title: item.title || `Galeriebild ${index + 1}`
+                }));
+            }
+
+            handleDeviceOrientationCheck();
+            updateDynamicTexts();
+            updateGalleryUI();
+        }
+
+        async function uploadManagedFile(event, slot) {
+            const input = event.target;
+            const files = Array.from(input.files || []);
+
+            if (!files.length) {
+                return;
+            }
+
+            try {
+                for (const file of files) {
+                    const formData = new FormData();
+                    formData.append('action', 'upload');
+                    formData.append('slot', slot);
+                    formData.append('token', ADMIN_UPLOAD_TOKEN);
+                    formData.append('file', file);
+
+                    const response = await fetch(UPLOAD_ENDPOINT, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    let payload;
+                    try {
+                        payload = await response.json();
+                    } catch (jsonError) {
+                        throw new Error('Server returned no valid JSON. Is PHP running?');
+                    }
+
+                    if (!response.ok || !payload.success) {
+                        throw new Error(payload.message || 'Upload failed.');
+                    }
+
+                    if (payload.manifest) {
+                        applyServerManifest(payload.manifest);
+                    }
+
+                    showToast(`"${file.name}" wurde erfolgreich hochgeladen und öffentlich synchronisiert.`);
+                }
+            } catch (error) {
+                console.error(error);
+                showToast(`Upload fehlgeschlagen: ${error.message}`);
+            } finally {
+                input.value = '';
+            }
+        }
 
         // Automatischer Hintergrund-Entferner für Slogan
         function removeWhiteBackground(imgElement) {
@@ -931,7 +1067,7 @@
 
         // Automatisches Laden der Slogan-Datei vom Live-Webserver beim Starten
         function loadServerSlogan() {
-            fetch('documents/SLOGAN_TEXT.txt')
+            fetch('documents/slogan_text.txt')
                 .then(response => {
                     if (response.ok) {
                         return response.text();
@@ -941,7 +1077,7 @@
                 .then(text => {
                     if (text && text.trim().length > 0) {
                         database.custom_slogan.text = text.trim();
-                        database.custom_slogan.filename = 'documents/SLOGAN_TEXT.txt';
+                        database.custom_slogan.filename = 'documents/slogan_text.txt';
                         updateDynamicTexts();
                         console.log("Slogan vom Server erfolgreich geladen: ", text.trim());
                     }
@@ -970,24 +1106,58 @@
             }
         }
 
-        function resetSloganText() {
-            database.custom_slogan.text = "";
-            database.custom_slogan.filename = "";
-            updateDynamicTexts();
-            showToast("Slogan zurückgesetzt. Pinsellogo wieder aktiv.");
+        async function resetSloganText() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'delete');
+                formData.append('slot', 'slogan');
+                formData.append('token', ADMIN_UPLOAD_TOKEN);
+
+                const response = await fetch(UPLOAD_ENDPOINT, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                let payload;
+                try {
+                    payload = await response.json();
+                } catch (jsonError) {
+                    throw new Error('Server returned no valid JSON. Is PHP running?');
+                }
+
+                if (!response.ok || !payload.success) {
+                    throw new Error(payload.message || 'Delete failed.');
+                }
+
+                if (payload.manifest) {
+                    applyServerManifest(payload.manifest);
+                } else {
+                    database.custom_slogan.text = "";
+                    database.custom_slogan.filename = "";
+                    updateDynamicTexts();
+                }
+
+                showToast("Slogan-Datei gelöscht. Das Standardbild slogan.png ist wieder aktiv.");
+            } catch (error) {
+                console.error(error);
+                showToast(`Löschen fehlgeschlagen: ${error.message}`);
+            }
         }
 
         // Hero-Bild nach Gerät ausrichten
         function handleDeviceOrientationCheck() {
             const isMobile = window.innerWidth < 768;
             const heroImg = document.getElementById('hero-bg-img');
-            if (heroImg) {
-                if (isMobile) {
-                    heroImg.src = database.hero_mobile.dataUrl || database.hero_mobile.filename;
-                } else {
-                    heroImg.src = database.hero_desktop.dataUrl || database.hero_desktop.filename;
-                }
+
+            if (!heroImg) {
+                return;
             }
+
+            const source = isMobile
+                ? database.hero_mobile.filename
+                : database.hero_desktop.filename;
+
+            heroImg.src = cacheBustPath(source);
         }
         window.addEventListener('resize', handleDeviceOrientationCheck);
 
@@ -1043,30 +1213,40 @@
         function updateGalleryUI() {
             const grid = document.getElementById('gallery-grid');
             const adminList = document.getElementById('admin-gallery-list');
-            
+
+            const renderUrl = (url) => cacheBustPath(url);
+
             if (grid) {
-                grid.innerHTML = galleryImages.map(img => `
-                    <div class="relative overflow-hidden rounded-xl h-48 sm:h-64 shadow-md group cursor-pointer" onclick="openLightbox('${img.url}')">
-                        <img src="${img.url}" alt="${img.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                            <p class="text-white text-xs font-bold font-sans tracking-wide uppercase">${img.title}</p>
+                grid.innerHTML = galleryImages.map(img => {
+                    const safeTitle = escapeHtml(img.title);
+                    const safeUrl = renderUrl(img.url);
+
+                    return `
+                        <div class="relative overflow-hidden rounded-xl h-48 sm:h-64 shadow-md group cursor-pointer" onclick="openLightbox('${safeUrl}')">
+                            <img src="${safeUrl}" alt="${safeTitle}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <p class="text-white text-xs font-bold font-sans tracking-wide uppercase">${safeTitle}</p>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
 
             if (adminList) {
-                adminList.innerHTML = galleryImages.map(img => `
-                    <div class="relative bg-white border border-steiermark-200 rounded-lg p-2 flex flex-col space-y-2">
-                        <div class="h-24 rounded overflow-hidden">
-                            <img src="${img.url}" alt="" class="w-full h-full object-cover" />
+                adminList.innerHTML = galleryImages.map(img => {
+                    const safeTitle = escapeHtml(img.title);
+                    const safeUrl = renderUrl(img.url);
+
+                    return `
+                        <div class="relative bg-white border border-steiermark-200 rounded-lg p-2 flex flex-col space-y-2">
+                            <div class="h-24 rounded overflow-hidden">
+                                <img src="${safeUrl}" alt="" class="w-full h-full object-cover" />
+                            </div>
+                            <p class="text-[10px] text-steiermark-800 font-extrabold truncate">${safeTitle}</p>
+                            <p class="text-[10px] text-steiermark-500 truncate">${escapeHtml(img.url)}</p>
                         </div>
-                        <p class="text-[10px] text-steiermark-800 font-extrabold truncate">${img.title}</p>
-                        <button onclick="deleteGalleryImage(${img.id})" class="bg-red-500 hover:bg-red-700 text-white font-extrabold text-[10px] py-1 rounded transition-all flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-trash-can"></i> Löschen
-                        </button>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
         }
 
@@ -1208,7 +1388,7 @@
         function updateDynamicTexts() {
             const setText = (id, val) => {
                 const el = document.getElementById(id);
-                if (el) el.innerText = val;
+                if (el) el.innerText = val || '';
             };
 
             setText('user-speisekarte-filename', database.speisekarte.filename);
@@ -1218,6 +1398,8 @@
             setText('user-angebote-filename', database.sport_und_erholung.filename);
             setText('user-kursangebote-filename', database.kursangebote.filename);
 
+            setText('admin-hero-desktop-filename', database.hero_desktop.filename);
+            setText('admin-hero-mobile-filename', database.hero_mobile.filename);
             setText('admin-speisekarte-filename', database.speisekarte.filename);
             setText('admin-poolparty-filename', database.poolparty.filename);
             setText('admin-events-filename', database.events.filename);
@@ -1231,38 +1413,40 @@
             const resetBtn = document.getElementById('reset-slogan-btn');
             const sloganStatus = document.getElementById('admin-slogan-status');
 
-            if (database.custom_slogan.text !== "") {
+            if (database.custom_slogan.text !== '') {
                 if (sloganContainer) sloganContainer.classList.add('hidden');
                 if (fallbackSlogan) fallbackSlogan.classList.remove('hidden');
                 if (targetSloganText) targetSloganText.innerText = database.custom_slogan.text;
                 if (resetBtn) resetBtn.classList.remove('hidden');
-                if (sloganStatus) sloganStatus.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> Aktiv: "' + database.custom_slogan.filename + '"</span>';
+                if (sloganStatus) sloganStatus.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> Aktiv: "' + escapeHtml(database.custom_slogan.filename) + '"</span>';
             } else {
                 if (sloganContainer) sloganContainer.classList.remove('hidden');
                 if (fallbackSlogan) fallbackSlogan.classList.add('hidden');
                 if (resetBtn) resetBtn.classList.add('hidden');
-                if (sloganStatus) sloganStatus.innerText = "Kein benutzerdefinierter Slogan (Standard-Bild aktiv)";
+                if (sloganStatus) sloganStatus.innerText = 'Kein benutzerdefinierter Slogan (Standard-Bild aktiv)';
             }
 
             const poolpartyPreviewTarget = document.getElementById('poolparty-preview-target');
+
             if (poolpartyPreviewTarget) {
-                if (database.poolparty.dataUrl) {
-                    if (database.poolparty.isImage) {
-                        poolpartyPreviewTarget.innerHTML = '<img id="poolparty-img" src="' + database.poolparty.dataUrl + '" alt="Abende die in Erinnerung bleiben" class="w-full h-48 sm:h-72 object-cover object-center group-hover:scale-105 transition-transform duration-300" />';
-                    } else {
-                        poolpartyPreviewTarget.innerHTML = '<div class="bg-steiermark-800 text-white p-4 text-center space-y-2 h-24 flex flex-col justify-center items-center"><div class="text-accent-gold text-2xl"><i class="fa-solid fa-file-pdf"></i></div><p class="text-[10px] text-steiermark-300 truncate max-w-[150px] font-semibold">' + database.poolparty.filename + '</p></div>';
-                    }
-                } else {
-                    poolpartyPreviewTarget.innerHTML = '<img id="poolparty-img" src="images/poolparty.png" alt="Poolparty Bergbad Retznei" class="w-full h-48 sm:h-72 object-cover object-center group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src=\'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80\';" />';
-                }
+                const poolpartyPath = database.poolparty.filename || 'images/poolparty.png';
+
+                poolpartyPreviewTarget.innerHTML = `
+                    <img id="poolparty-img"
+                         src="${cacheBustPath(poolpartyPath)}"
+                         alt="Poolparty Bergbad Retznei"
+                         class="w-full h-48 sm:h-72 object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80';" />
+                `;
             }
 
             const eventsPreviewTarget = document.getElementById('events-preview-target');
             const eventsPdfIframe = document.getElementById('events-pdf-iframe');
+
             if (eventsPreviewTarget && eventsPdfIframe) {
-                if (database.events.dataUrl && !database.events.isImage) {
+                if (database.events.filename) {
                     eventsPreviewTarget.classList.remove('hidden');
-                    eventsPdfIframe.src = database.events.dataUrl;
+                    eventsPdfIframe.src = cacheBustPath(database.events.filename);
                 } else {
                     eventsPreviewTarget.classList.add('hidden');
                 }
@@ -1279,67 +1463,15 @@
                 'Kursangebot-PDF': 'kursangebote',
                 'Events-PDF': 'events'
             };
+
             const dbKey = keyMap[areaName];
 
-            // 1. Wenn ein lokaler Upload im Admin-Dashboard stattgefunden hat (Vorschau aus Data-URL)
-            if (database[dbKey] && database[dbKey].dataUrl) {
-                const newWindow = window.open();
-                if (newWindow) {
-                    newWindow.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Bergbad Retznei - Preview</title><style>html,body{margin:0;padding:0;width:100%;height:100%;background:#0f2b1d;display:flex;align-items:center;justify-content:center;}iframe,img{border:none;width:100%;height:100%;object-fit:contain;}</style></head><body>');
-                    if (database[dbKey].isImage) {
-                        newWindow.document.write('<img src="' + database[dbKey].dataUrl + '" alt="Vorschau" />');
-                    } else {
-                        newWindow.document.write('<iframe src="' + database[dbKey].dataUrl + '"></iframe>');
-                    }
-                    newWindow.document.write('</body></html>');
-                    newWindow.document.close();
-                } else {
-                    const downloadLink = document.createElement('a');
-                    downloadLink.href = database[dbKey].dataUrl;
-                    downloadLink.download = database[dbKey].filename;
-                    downloadLink.click();
-                    downloadLink.remove();
-                }
-                return;
-            }
-
-            // 2. Standard Server-Betrieb: Öffnet direkt die PDF im documents- oder images-Ordner
             if (database[dbKey] && database[dbKey].filename) {
-                window.open(database[dbKey].filename, '_blank');
+                window.open(cacheBustPath(database[dbKey].filename), '_blank');
                 return;
             }
 
-            // Fallback Modal (Sicherheitsnetz)
-            const customModal = document.createElement('div');
-            customModal.className = "fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all";
-            
-            const targetFilename = database[dbKey] ? database[dbKey].filename : 'datei.pdf';
-            
-            customModal.innerHTML = `
-                <div class="bg-white border border-steiermark-200 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 text-steiermark-900">
-                    <div class="flex items-center gap-3 text-accent-gold">
-                        <i class="fa-solid fa-file-arrow-down text-3xl"></i>
-                        <h4 class="text-lg font-black">Simulation: Download läuft</h4>
-                    </div>
-                    <p class="text-xs text-steiermark-700 leading-relaxed font-medium">
-                        Hier öffnet sich in der realen Webseite das vom Pächter hochgeladene PDF-Dokument oder Bild für die Sektion <strong>` + areaName + `</strong>. 
-                        Es ist mobil-optimiert und kann direkt am Smartphone des Gastes gespeichert oder ausgedruckt werden.
-                    </p>
-                    <div class="bg-steiermark-100 rounded-xl p-4 text-xs font-mono text-steiermark-800 border border-steiermark-200">
-                        Zieldatei: ` + targetFilename + `
-                    </div>
-                    <div class="flex justify-end pt-2">
-                        <button id="close-modal-btn" class="bg-steiermark-500 hover:bg-steiermark-800 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg transition-all shadow">
-                            Schließen
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(customModal);
-            
-            document.getElementById('close-modal-btn').addEventListener('click', () => {
-                customModal.remove();
-            });
+            showToast(`Keine Datei für "${areaName}" gefunden.`);
         }
 
         // Steuerung der UI Toasts
@@ -1360,20 +1492,25 @@
 
         // Überprüfung und Initialisierung beim Seitenstart
         window.onload = function() {
-            // Zeige die Admin-Leiste wenn der URL-Parameter ?admin vorhanden ist
             const urlParams = new URLSearchParams(window.location.search);
+
             if (urlParams.has('admin')) {
                 const adminBar = document.getElementById('top-simulation-bar');
-                if (adminBar) adminBar.classList.remove('hidden');
+                if (adminBar) {
+                    adminBar.classList.remove('hidden');
+                }
             }
-            
+
             setView('user');
             setLanguage('de');
+
+            // First render static fallback, then overwrite with live server state.
             handleDeviceOrientationCheck();
             updateGalleryUI();
-            
-            // Slogan automatisch vom Server laden
-            loadServerSlogan();
+            updateDynamicTexts();
+
+            // Synchronization fix for both /index.html and /index.html?admin.
+            fetchLiveContent();
         };
     </script>
 </body>
