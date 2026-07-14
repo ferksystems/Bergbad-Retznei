@@ -4,8 +4,8 @@ declare(strict_types=1);
 /**
  * /js/upload.php
  *
- * Handles secure admin uploads, deletion of the slogan text file,
- * and provides a public manifest for index.html.
+ * Handles secure admin uploads, deletion of slogan/gallery files,
+ * editable tariff data, and provides a public manifest for index.html.
  *
  * Directory structure:
  *   /index.html
@@ -102,13 +102,56 @@ if ($action === 'manifest') {
     jsonResponse(true, 'Manifest loaded.', ['manifest' => $manifest]);
 }
 
-if (!in_array($action, ['upload', 'delete'], true)) {
+if (!in_array($action, ['upload', 'delete', 'save_tariffs'], true)) {
     jsonResponse(false, 'Invalid action.', [], 400);
 }
 
 $token = $_POST['token'] ?? '';
 if (!hash_equals(ADMIN_UPLOAD_TOKEN, $token)) {
     jsonResponse(false, 'Unauthorized request.', [], 401);
+}
+
+if ($action === 'save_tariffs') {
+    $rawTariffs = $_POST['tariffs'] ?? '';
+    $tariffs = json_decode((string)$rawTariffs, true);
+
+    if (!is_array($tariffs) || count($tariffs) !== 4) {
+        jsonResponse(false, 'Exactly four tariff entries are required.', [], 400);
+    }
+
+    $validatedTariffs = [];
+    foreach ($tariffs as $index => $item) {
+        if (!is_array($item)) {
+            jsonResponse(false, 'Invalid tariff entry at position ' . ($index + 1) . '.', [], 400);
+        }
+
+        $label = trim((string)($item['label'] ?? ''));
+        $price = trim((string)($item['price'] ?? ''));
+
+        if ($label === '' || $price === '') {
+            jsonResponse(false, 'Tariff labels and prices must not be empty.', [], 400);
+        }
+
+        if (mb_strlen($label) > 100 || mb_strlen($price) > 30) {
+            jsonResponse(false, 'A tariff label or price is too long.', [], 400);
+        }
+
+        $validatedTariffs[] = [
+            'label' => $label,
+            'price' => $price,
+        ];
+    }
+
+    $manifest = loadManifest($manifestPath);
+    $manifest['tariffs'] = $validatedTariffs;
+    $manifest['version'] = time();
+
+    saveManifest($manifestPath, $manifest);
+    enrichManifest($manifest, $documentDir);
+
+    jsonResponse(true, 'Tariffs saved successfully.', [
+        'manifest' => $manifest,
+    ]);
 }
 
 $slot = $_POST['slot'] ?? '';
@@ -119,33 +162,83 @@ if (!isset($slots[$slot])) {
 $config = $slots[$slot];
 
 if ($action === 'delete') {
-    if ($slot !== 'slogan') {
-        jsonResponse(false, 'Delete is currently only enabled for the slogan text file.', [], 400);
-    }
+    if ($slot === 'slogan') {
+        ensureDirectory($documentDir);
 
-    ensureDirectory($documentDir);
-
-    // Delete canonical and legacy names. This prevents stale behavior after renaming.
-    $deleted = false;
-    foreach (['slogan_text.txt', 'SLOGAN_TEXT.txt'] as $fileName) {
-        $path = $documentDir . DIRECTORY_SEPARATOR . $fileName;
-        if (is_file($path)) {
-            $deleted = @unlink($path) || $deleted;
+        // Delete canonical and legacy names. This prevents stale behavior after renaming.
+        $deleted = false;
+        foreach (['slogan_text.txt', 'SLOGAN_TEXT.txt'] as $fileName) {
+            $path = $documentDir . DIRECTORY_SEPARATOR . $fileName;
+            if (is_file($path)) {
+                $deleted = @unlink($path) || $deleted;
+            }
         }
+
+        $manifest = loadManifest($manifestPath);
+        unset($manifest['files']['slogan']);
+        $manifest['sloganText'] = '';
+        $manifest['version'] = time();
+
+        saveManifest($manifestPath, $manifest);
+        enrichManifest($manifest, $documentDir);
+
+        jsonResponse(true, $deleted ? 'Slogan text file deleted.' : 'No slogan text file existed.', [
+            'slot' => $slot,
+            'manifest' => $manifest,
+        ]);
     }
 
-    $manifest = loadManifest($manifestPath);
-    unset($manifest['files']['slogan']);
-    $manifest['sloganText'] = '';
-    $manifest['version'] = time();
+    if ($slot === 'gallery') {
+        $galleryId = trim((string)($_POST['gallery_id'] ?? ''));
+        $requestedPath = trim((string)($_POST['path'] ?? ''));
+        $manifest = loadManifest($manifestPath);
+        $gallery = is_array($manifest['gallery'] ?? null) ? $manifest['gallery'] : [];
 
-    saveManifest($manifestPath, $manifest);
-    enrichManifest($manifest, $documentDir);
+        $matchedItem = null;
+        $remainingGallery = [];
 
-    jsonResponse(true, $deleted ? 'Slogan text file deleted.' : 'No slogan text file existed.', [
-        'slot' => $slot,
-        'manifest' => $manifest,
-    ]);
+        foreach ($gallery as $item) {
+            $itemId = (string)($item['id'] ?? '');
+            $itemPath = (string)($item['path'] ?? '');
+            $matches = ($galleryId !== '' && hash_equals($itemId, $galleryId))
+                || ($requestedPath !== '' && hash_equals($itemPath, $requestedPath));
+
+            if ($matches && $matchedItem === null) {
+                $matchedItem = $item;
+                continue;
+            }
+
+            $remainingGallery[] = $item;
+        }
+
+        if ($matchedItem === null) {
+            jsonResponse(false, 'Gallery image was not found in the manifest.', [], 404);
+        }
+
+        $storedPath = (string)($matchedItem['path'] ?? '');
+        if (!preg_match('#^images/gallery_[a-zA-Z0-9_\-]+\.(png|jpg|jpeg)$#', $storedPath)) {
+            jsonResponse(false, 'Stored gallery path is invalid.', [], 400);
+        }
+
+        $absolutePath = $rootDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $storedPath);
+        $deleted = !is_file($absolutePath) || @unlink($absolutePath);
+
+        if (!$deleted) {
+            jsonResponse(false, 'Gallery image could not be deleted. Check file permissions.', [], 500);
+        }
+
+        $manifest['gallery'] = array_values($remainingGallery);
+        $manifest['version'] = time();
+        saveManifest($manifestPath, $manifest);
+        enrichManifest($manifest, $documentDir);
+
+        jsonResponse(true, 'Gallery image deleted.', [
+            'slot' => $slot,
+            'manifest' => $manifest,
+        ]);
+    }
+
+    jsonResponse(false, 'Delete is only enabled for slogan and gallery files.', [], 400);
 }
 
 if (!isset($_FILES['file']) || !is_uploaded_file($_FILES['file']['tmp_name'])) {
@@ -293,6 +386,12 @@ function loadManifest(string $manifestPath): array
         ],
         'gallery' => [],
         'sloganText' => '',
+        'tariffs' => [
+            ['label' => 'Tageskarte Erwachsene', 'price' => '€ 5,00'],
+            ['label' => 'Erwachsene ab 16:00 Uhr', 'price' => '€ 4,00'],
+            ['label' => 'Kinder (6 - 15 Jahre)', 'price' => '€ 3,00'],
+            ['label' => 'Saisonkarte Erwachsene', 'price' => '€ 80,00'],
+        ],
     ];
 
     if (!is_file($manifestPath)) {
